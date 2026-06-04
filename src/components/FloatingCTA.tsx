@@ -32,7 +32,7 @@ export default function FloatingCTA() {
         <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 w-64 mb-1">
           <div className="flex items-start justify-between mb-2">
             <p className="text-xs font-bold text-[#C9A84C] uppercase tracking-wider">Para ocasiones especiales</p>
-            <button onClick={() => setDismissed(true)} className="text-gray-300 hover:text-gray-500 transition-colors -mt-0.5 -mr-1">
+            <button onClick={() => setExpanded(false)} className="text-gray-300 hover:text-gray-500 transition-colors -mt-0.5 -mr-1">
               <X size={14} />
             </button>
           </div>

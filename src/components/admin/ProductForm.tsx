@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2, Plus, X } from "lucide-react";
+import { Loader2, Plus, X, Upload, Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
 
 interface Size { id: string; name: string; priceModifier: number; }
 
@@ -26,6 +27,7 @@ const CATEGORIES = ["aromaticas", "decorativas", "relajacion", "regalo", "navida
 export default function ProductForm({ initialData }: { initialData?: Partial<ProductFormData> }) {
   const router = useRouter();
   const isEditing = !!initialData?.id;
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState<ProductFormData>({
     id: initialData?.id ?? "",
@@ -43,10 +45,58 @@ export default function ProductForm({ initialData }: { initialData?: Partial<Pro
   const [newAroma, setNewAroma] = useState("");
   const [newSize, setNewSize] = useState({ id: "", name: "", priceModifier: 0 });
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [error, setError] = useState("");
+  const [imagePreview, setImagePreview] = useState<string>(initialData?.image_url ?? "");
 
   const slugify = (text: string) =>
     text.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validar tipo y tamaño
+    if (!file.type.startsWith("image/")) {
+      setError("Solo se permiten imágenes");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError("La imagen no puede superar 5MB");
+      return;
+    }
+
+    setError("");
+    setUploadingImage(true);
+
+    // Preview local inmediato
+    const localUrl = URL.createObjectURL(file);
+    setImagePreview(localUrl);
+
+    try {
+      const supabase = createClient();
+      const ext = file.name.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("products")
+        .upload(fileName, file, { upsert: false });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("products")
+        .getPublicUrl(fileName);
+
+      setForm((f) => ({ ...f, image_url: publicUrl }));
+      setImagePreview(publicUrl);
+    } catch (err) {
+      setError("Error al subir la imagen. Intenta de nuevo.");
+      setImagePreview(initialData?.image_url ?? "");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,8 +134,7 @@ export default function ProductForm({ initialData }: { initialData?: Partial<Pro
 
   const addSize = () => {
     if (newSize.name.trim()) {
-      const sizeToAdd = { ...newSize, id: slugify(newSize.name) };
-      setForm((f) => ({ ...f, sizes: [...f.sizes, sizeToAdd] }));
+      setForm((f) => ({ ...f, sizes: [...f.sizes, { ...newSize, id: slugify(newSize.name) }] }));
       setNewSize({ id: "", name: "", priceModifier: 0 });
     }
   };
@@ -158,37 +207,76 @@ export default function ProductForm({ initialData }: { initialData?: Partial<Pro
               </select>
             </div>
 
-            <div>
-              <label className="text-xs font-medium text-gray-600 block mb-1">URL de imagen</label>
-              <input
-                type="url"
-                value={form.image_url}
-                onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))}
-                placeholder="https://... (opcional)"
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C]"
-              />
-            </div>
-
             <div className="flex gap-6">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.featured}
-                  onChange={(e) => setForm((f) => ({ ...f, featured: e.target.checked }))}
-                  className="w-4 h-4 accent-[#C9A84C]"
-                />
+                <input type="checkbox" checked={form.featured} onChange={(e) => setForm((f) => ({ ...f, featured: e.target.checked }))} className="w-4 h-4 accent-[#C9A84C]" />
                 <span className="text-sm text-gray-700">Producto destacado</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.active}
-                  onChange={(e) => setForm((f) => ({ ...f, active: e.target.checked }))}
-                  className="w-4 h-4 accent-[#C9A84C]"
-                />
+                <input type="checkbox" checked={form.active} onChange={(e) => setForm((f) => ({ ...f, active: e.target.checked }))} className="w-4 h-4 accent-[#C9A84C]" />
                 <span className="text-sm text-gray-700">Activo (visible)</span>
               </label>
             </div>
+          </div>
+
+          {/* Imagen */}
+          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+            <h2 className="font-semibold text-gray-900 mb-4">Imagen del producto</h2>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageSelect}
+              className="hidden"
+            />
+
+            {imagePreview ? (
+              <div className="relative group">
+                <div className="aspect-square rounded-xl overflow-hidden bg-[#F9F0E6] relative">
+                  <Image src={imagePreview} alt="Preview" fill className="object-cover" unoptimized />
+                </div>
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingImage}
+                    className="bg-white text-gray-800 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
+                  >
+                    {uploadingImage ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                    Cambiar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setImagePreview(""); setForm((f) => ({ ...f, image_url: "" })); }}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
+                  >
+                    <X size={14} /> Quitar
+                  </button>
+                </div>
+                {uploadingImage && (
+                  <div className="absolute inset-0 bg-white/70 rounded-xl flex items-center justify-center">
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Loader2 size={18} className="animate-spin text-[#C9A84C]" />
+                      Subiendo imagen...
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingImage}
+                className="w-full aspect-square rounded-xl border-2 border-dashed border-[#E8C97A] bg-[#FAF7F2] hover:bg-[#F9F0E6] transition-colors flex flex-col items-center justify-center gap-3 text-[#8B6914]/60 hover:text-[#8B6914]"
+              >
+                {uploadingImage ? (
+                  <><Loader2 size={28} className="animate-spin" /><span className="text-sm">Subiendo...</span></>
+                ) : (
+                  <><ImageIcon size={28} /><span className="text-sm font-medium">Clic para subir imagen</span><span className="text-xs">JPG, PNG, WEBP · máx 5MB</span></>
+                )}
+              </button>
+            )}
           </div>
         </div>
 
@@ -225,7 +313,7 @@ export default function ProductForm({ initialData }: { initialData?: Partial<Pro
           {/* Tamaños */}
           <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
             <h2 className="font-semibold text-gray-900 mb-4">Tamaños / variantes</h2>
-            <div className="grid grid-cols-[1fr_auto_80px] gap-2 mb-3">
+            <div className="grid grid-cols-[1fr_80px_40px] gap-2 mb-3">
               <input
                 value={newSize.name}
                 onChange={(e) => setNewSize((s) => ({ ...s, name: e.target.value }))}
@@ -237,13 +325,13 @@ export default function ProductForm({ initialData }: { initialData?: Partial<Pro
                 value={newSize.priceModifier}
                 onChange={(e) => setNewSize((s) => ({ ...s, priceModifier: Number(e.target.value) }))}
                 placeholder="+$"
-                className="w-20 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#C9A84C]"
+                className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#C9A84C]"
               />
-              <button type="button" onClick={addSize} className="btn-gold px-3 py-2 rounded-xl flex items-center justify-center">
+              <button type="button" onClick={addSize} className="btn-gold px-2 py-2 rounded-xl flex items-center justify-center">
                 <Plus size={16} />
               </button>
             </div>
-            <p className="text-xs text-gray-400 mb-3">Precio adicional sobre el precio base (0 si es el mismo precio)</p>
+            <p className="text-xs text-gray-400 mb-3">Precio adicional sobre el precio base (0 si es igual)</p>
             <div className="space-y-2">
               {form.sizes.map((size) => (
                 <div key={size.id} className="flex items-center justify-between bg-gray-50 rounded-xl px-3 py-2">
@@ -252,11 +340,7 @@ export default function ProductForm({ initialData }: { initialData?: Partial<Pro
                     <span className="text-xs text-[#C9A84C] font-semibold">
                       {size.priceModifier > 0 ? `+$${size.priceModifier}` : "Precio base"}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => setForm((f) => ({ ...f, sizes: f.sizes.filter((s) => s.id !== size.id) }))}
-                      className="text-gray-400 hover:text-red-500"
-                    >
+                    <button type="button" onClick={() => setForm((f) => ({ ...f, sizes: f.sizes.filter((s) => s.id !== size.id) }))} className="text-gray-400 hover:text-red-500">
                       <X size={14} />
                     </button>
                   </div>
@@ -268,21 +352,13 @@ export default function ProductForm({ initialData }: { initialData?: Partial<Pro
         </div>
       </div>
 
-      {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+      {error && <p className="text-red-500 text-sm text-center bg-red-50 py-2 rounded-xl">{error}</p>}
 
       <div className="flex gap-3 justify-end">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-sm hover:bg-gray-50 transition-colors"
-        >
+        <button type="button" onClick={() => router.back()} className="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 text-sm hover:bg-gray-50 transition-colors">
           Cancelar
         </button>
-        <button
-          type="submit"
-          disabled={loading}
-          className="btn-gold px-8 py-2.5 rounded-xl flex items-center gap-2 text-sm disabled:opacity-60"
-        >
+        <button type="submit" disabled={loading || uploadingImage} className="btn-gold px-8 py-2.5 rounded-xl flex items-center gap-2 text-sm disabled:opacity-60">
           {loading ? <><Loader2 size={16} className="animate-spin" /> Guardando...</> : isEditing ? "Guardar cambios" : "Crear producto"}
         </button>
       </div>

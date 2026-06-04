@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { Trash2, ArrowLeft, ShoppingBag, MessageCircle } from "lucide-react";
+import { Trash2, ArrowLeft, ShoppingBag } from "lucide-react";
 import { useToast } from "@/components/Toast";
 
 export default function CarritoPage() {
@@ -121,22 +121,12 @@ export default function CarritoPage() {
               <span className="text-[#C9A84C] text-lg">{formatted(total)}</span>
             </div>
 
-            <div className="space-y-3">
-              <Link
-                href="/checkout"
-                className="btn-gold w-full py-3.5 rounded-full flex items-center justify-center gap-2"
-              >
-                <ShoppingBag size={18} /> Pagar en línea
-              </Link>
-              <a
-                href={`https://wa.me/5215563442525?text=${whatsappSummary}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-3.5 rounded-full border-2 border-[#C9A84C] text-[#C9A84C] font-semibold flex items-center justify-center gap-2 hover:bg-[#C9A84C] hover:text-white transition-all"
-              >
-                <MessageCircle size={18} /> Pedir por WhatsApp
-              </a>
-            </div>
+            <Link
+              href="/checkout"
+              className="btn-gold w-full py-3.5 rounded-full flex items-center justify-center gap-2 font-semibold"
+            >
+              <ShoppingBag size={18} /> Ir a pagar
+            </Link>
           </div>
         </div>
       </div>

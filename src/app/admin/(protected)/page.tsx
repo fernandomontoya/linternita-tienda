@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { Package, Star, AlertTriangle, XCircle, Plus, ArrowRight, Pencil } from "lucide-react";
+import { Package, Star, AlertTriangle, XCircle, Plus, ArrowRight, Pencil, ShoppingBag } from "lucide-react";
 import { categories } from "@/data/products";
 
 export default async function AdminDashboard() {
@@ -10,14 +10,18 @@ export default async function AdminDashboard() {
     .select("*")
     .order("created_at", { ascending: false });
 
+  const { data: orders } = await supabase.from("orders").select("id, status, total");
+  const pendingOrders = orders?.filter((o) => o.status === "pendiente").length ?? 0;
+  const totalRevenue = orders?.reduce((sum, o) => sum + Number(o.total), 0) ?? 0;
+
   const total = products?.length ?? 0;
   const featured = products?.filter((p) => p.featured).length ?? 0;
   const lowStock = products?.filter((p) => p.stock <= 5 && p.stock > 0).length ?? 0;
   const outOfStock = products?.filter((p) => p.stock === 0).length ?? 0;
 
   const stats = [
-    { icon: Package, label: "Productos", value: total, sub: "en catálogo", bg: "bg-blue-50", color: "text-blue-600" },
-    { icon: Star, label: "Destacados", value: featured, sub: "en inicio", bg: "bg-amber-50", color: "text-amber-600" },
+    { icon: ShoppingBag, label: "Pedidos nuevos", value: pendingOrders, sub: "por atender", bg: "bg-[#F9F0E6]", color: "text-[#C9A84C]", href: "/admin/pedidos" },
+    { icon: Package, label: "Productos", value: total, sub: "en catálogo", bg: "bg-blue-50", color: "text-blue-600", href: "/admin/productos" },
     { icon: AlertTriangle, label: "Stock bajo", value: lowStock, sub: "≤ 5 piezas", bg: "bg-orange-50", color: "text-orange-500" },
     { icon: XCircle, label: "Agotados", value: outOfStock, sub: "sin stock", bg: "bg-red-50", color: "text-red-500" },
   ];
@@ -44,7 +48,7 @@ export default async function AdminDashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {stats.map(({ icon: Icon, label, value, sub, bg, color }) => (
+        {stats.map(({ icon: Icon, label, value, sub, bg, color, href }) => (
           <div key={label} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
             <div className={`inline-flex w-9 h-9 rounded-xl items-center justify-center mb-3 ${bg} ${color}`}>
               <Icon size={16} />

@@ -7,6 +7,7 @@ export interface DbProduct {
   price: number;
   category: string;
   image_url: string | null;
+  images: string[] | null;
   aromas: string[] | null;
   sizes: { id: string; name: string; priceModifier: number }[] | null;
   featured: boolean;

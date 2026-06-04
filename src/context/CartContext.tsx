@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 import { Product } from "@/data/products";
 
 export interface CartItem {
@@ -21,10 +21,30 @@ interface CartContextType {
   count: number;
 }
 
+const STORAGE_KEY = "linternita-cart";
+
 const CartContext = createContext<CartContextType | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Cargar desde localStorage al montar
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) setItems(JSON.parse(saved));
+    } catch {}
+    setHydrated(true);
+  }, []);
+
+  // Guardar en localStorage cada vez que cambia el carrito
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch {}
+  }, [items, hydrated]);
 
   const addItem = useCallback((newItem: CartItem) => {
     setItems((prev) => {

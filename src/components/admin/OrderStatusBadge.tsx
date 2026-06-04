@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 
 const STATUSES = [
   { value: "pendiente",  label: "Pendiente",   color: "bg-yellow-50 text-yellow-600" },
-  { value: "confirmado", label: "Confirmado",  color: "bg-blue-50 text-blue-600" },
-  { value: "enviado",    label: "Enviado",     color: "bg-purple-50 text-purple-600" },
+  { value: "pagado",     label: "Pagado",      color: "bg-blue-50 text-blue-600" },
+  { value: "en_proceso", label: "En proceso",  color: "bg-purple-50 text-purple-600" },
+  { value: "enviado",    label: "Enviado",     color: "bg-indigo-50 text-indigo-600" },
   { value: "entregado",  label: "Entregado",   color: "bg-green-50 text-green-600" },
   { value: "cancelado",  label: "Cancelado",   color: "bg-red-50 text-red-500" },
 ];

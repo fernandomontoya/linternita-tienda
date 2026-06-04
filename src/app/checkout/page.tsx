@@ -1,14 +1,46 @@
 "use client";
 
+import { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import Link from "next/link";
-import { ShoppingBag, ArrowLeft } from "lucide-react";
+import { ShoppingBag, ArrowLeft, AlertCircle } from "lucide-react";
+
+interface FormField {
+  value: string;
+  error: string;
+  touched: boolean;
+}
+
+const empty = (): FormField => ({ value: "", error: "", touched: false });
+
+const validators: Record<string, (v: string) => string> = {
+  nombre: (v) => (!v.trim() ? "El nombre es requerido" : ""),
+  apellido: (v) => (!v.trim() ? "El apellido es requerido" : ""),
+  email: (v) => (!v.trim() ? "El correo es requerido" : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? "Correo inválido" : ""),
+  telefono: (v) => (!v.trim() ? "El teléfono es requerido" : v.replace(/\D/g, "").length < 10 ? "Mínimo 10 dígitos" : ""),
+  direccion: (v) => (!v.trim() ? "La dirección es requerida" : v.trim().length < 10 ? "Escribe la dirección completa" : ""),
+};
 
 export default function CheckoutPage() {
   const { items, total } = useCart();
+  const [fields, setFields] = useState({
+    nombre: empty(), apellido: empty(), email: empty(), telefono: empty(), direccion: empty(),
+  });
 
-  const formatted = (price: number) =>
-    new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0 }).format(price);
+  const fmt = (p: number) =>
+    new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0 }).format(p);
+
+  const update = (name: keyof typeof fields, value: string) => {
+    const error = fields[name].touched ? validators[name](value) : "";
+    setFields((f) => ({ ...f, [name]: { value, error, touched: f[name].touched } }));
+  };
+
+  const blur = (name: keyof typeof fields) => {
+    const error = validators[name](fields[name].value);
+    setFields((f) => ({ ...f, [name]: { ...f[name], error, touched: true } }));
+  };
+
+  const isValid = Object.entries(fields).every(([k, f]) => !validators[k as keyof typeof fields](f.value));
 
   if (items.length === 0) {
     return (
@@ -22,16 +54,46 @@ export default function CheckoutPage() {
     );
   }
 
+  const Field = ({
+    name, label, type = "text", rows,
+  }: { name: keyof typeof fields; label: string; type?: string; rows?: number }) => {
+    const f = fields[name];
+    const hasError = f.touched && !!f.error;
+    const base = "w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-colors duration-150";
+    const cls = hasError
+      ? `${base} border-red-300 bg-red-50 focus:border-red-400`
+      : `${base} border-gray-200 focus:border-[#C9A84C]`;
+
+    return (
+      <div>
+        <label className="text-xs font-medium text-[#2C1810]/70 block mb-1">
+          {label} <span className="text-[#C9A84C]">*</span>
+        </label>
+        {rows ? (
+          <textarea rows={rows} value={f.value} onChange={(e) => update(name, e.target.value)}
+            onBlur={() => blur(name)} className={`${cls} resize-none`} placeholder={label} />
+        ) : (
+          <input type={type} value={f.value} onChange={(e) => update(name, e.target.value)}
+            onBlur={() => blur(name)} className={cls} placeholder={label} />
+        )}
+        {hasError && (
+          <p className="flex items-center gap-1 mt-1 text-xs text-red-500">
+            <AlertCircle size={11} /> {f.error}
+          </p>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
       <Link href="/carrito" className="flex items-center gap-2 text-sm text-[#2C1810]/60 hover:text-[#C9A84C] transition-colors mb-8">
         <ArrowLeft size={16} /> Volver al carrito
       </Link>
-
       <h1 className="text-3xl font-bold text-[#2C1810] mb-8">Finalizar Pedido</h1>
 
       {/* Resumen */}
-      <div className="bg-white rounded-2xl p-6 border border-[#E8C97A]/20 mb-8">
+      <div className="bg-white rounded-2xl p-6 border border-[#E8C97A]/20 mb-6">
         <h2 className="font-semibold text-[#2C1810] mb-4">Tu pedido</h2>
         {items.map((item, i) => (
           <div key={i} className="flex justify-between text-sm py-2 border-b border-[#E8C97A]/20 last:border-0">
@@ -39,61 +101,46 @@ export default function CheckoutPage() {
               {item.product.name} x{item.quantity}
               {item.selectedAroma ? ` — ${item.selectedAroma}` : ""}
             </span>
-            <span className="font-semibold">{formatted(item.unitPrice * item.quantity)}</span>
+            <span className="font-semibold">{fmt(item.unitPrice * item.quantity)}</span>
           </div>
         ))}
         <div className="flex justify-between font-bold text-[#C9A84C] mt-4 text-lg">
-          <span>Total</span>
-          <span>{formatted(total)}</span>
+          <span>Total</span><span>{fmt(total)}</span>
         </div>
       </div>
 
-      {/* Datos del cliente */}
-      <div className="bg-white rounded-2xl p-6 border border-[#E8C97A]/20 mb-8">
-        <h2 className="font-semibold text-[#2C1810] mb-4">Tus datos</h2>
+      {/* Datos */}
+      <div className="bg-white rounded-2xl p-6 border border-[#E8C97A]/20 mb-6">
+        <h2 className="font-semibold text-[#2C1810] mb-5">Tus datos</h2>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-xs font-medium text-[#2C1810]/70 mb-1 block">Nombre</label>
-              <input type="text" placeholder="Tu nombre" className="w-full border border-[#E8C97A]/50 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C]" />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-[#2C1810]/70 mb-1 block">Apellido</label>
-              <input type="text" placeholder="Tu apellido" className="w-full border border-[#E8C97A]/50 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C]" />
-            </div>
+            <Field name="nombre" label="Nombre" />
+            <Field name="apellido" label="Apellido" />
           </div>
-          <div>
-            <label className="text-xs font-medium text-[#2C1810]/70 mb-1 block">Correo electrónico</label>
-            <input type="email" placeholder="tu@correo.com" className="w-full border border-[#E8C97A]/50 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C]" />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-[#2C1810]/70 mb-1 block">Teléfono / WhatsApp</label>
-            <input type="tel" placeholder="+52 55 0000 0000" className="w-full border border-[#E8C97A]/50 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C]" />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-[#2C1810]/70 mb-1 block">Dirección de envío</label>
-            <textarea rows={3} placeholder="Calle, número, colonia, ciudad, estado, CP" className="w-full border border-[#E8C97A]/50 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C] resize-none" />
-          </div>
+          <Field name="email" label="Correo electrónico" type="email" />
+          <Field name="telefono" label="Teléfono / WhatsApp" type="tel" />
+          <Field name="direccion" label="Dirección de envío" rows={3} />
         </div>
       </div>
 
-      {/* MercadoPago placeholder */}
-      <div className="bg-[#F9F0E6] rounded-2xl p-6 border border-[#E8C97A]/30 text-center">
-        <p className="text-sm font-semibold text-[#2C1810] mb-2">Pago seguro con MercadoPago</p>
-        <p className="text-xs text-[#2C1810]/60 mb-4">Tarjeta de crédito, débito, OXXO, transferencia y más.</p>
-        <div className="flex justify-center gap-3 mb-6 flex-wrap">
+      {/* Pago */}
+      <div className="bg-[#F9F0E6] rounded-2xl p-6 border border-[#E8C97A]/30">
+        <p className="text-sm font-semibold text-[#2C1810] mb-1">Pago seguro con MercadoPago</p>
+        <p className="text-xs text-[#2C1810]/60 mb-4">Tarjeta, OXXO, transferencia SPEI y más.</p>
+        <div className="flex gap-2 mb-5 flex-wrap">
           {["VISA", "Mastercard", "OXXO", "SPEI"].map((m) => (
-            <span key={m} className="px-3 py-1 bg-white rounded-lg text-xs font-bold text-[#2C1810]/50 border border-[#E8C97A]/40">
-              {m}
-            </span>
+            <span key={m} className="px-3 py-1 bg-white rounded-lg text-xs font-bold text-[#2C1810]/40 border border-[#E8C97A]/40">{m}</span>
           ))}
         </div>
-        <button className="btn-gold w-full py-4 rounded-xl text-base">
-          Pagar {formatted(total)} con MercadoPago
+        <button
+          disabled={!isValid}
+          className="btn-gold w-full py-4 rounded-xl text-base disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+        >
+          {isValid ? `Pagar ${fmt(total)} con MercadoPago` : "Completa tus datos para continuar"}
         </button>
-        <p className="text-[10px] text-[#2C1810]/40 mt-3">
-          * La integración con MercadoPago se configura con tus credenciales de cuenta.
-        </p>
+        {!isValid && (
+          <p className="text-xs text-center text-[#2C1810]/40 mt-2">Todos los campos con * son obligatorios</p>
+        )}
       </div>
     </div>
   );

@@ -4,9 +4,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { Trash2, ArrowLeft, ShoppingBag, MessageCircle } from "lucide-react";
+import { useToast } from "@/components/Toast";
 
 export default function CarritoPage() {
   const { items, removeItem, updateQuantity, total, clearCart } = useCart();
+  const { toast } = useToast();
+
+  const handleClearCart = () => {
+    if (items.length === 0) return;
+    if (confirm("¿Vaciar el carrito? Perderás todos los productos agregados.")) {
+      clearCart();
+      toast("Carrito vaciado", "error");
+    }
+  };
 
   const formatted = (price: number) =>
     new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0 }).format(price);
@@ -42,7 +52,7 @@ export default function CarritoPage() {
           <ArrowLeft size={16} /> Seguir comprando
         </Link>
         <h1 className="text-2xl font-bold text-[#2C1810]">Tu Carrito</h1>
-        <button onClick={clearCart} className="text-xs text-[#2C1810]/40 hover:text-red-400 transition-colors">
+        <button onClick={handleClearCart} className="text-xs text-[#2C1810]/40 hover:text-red-400 transition-colors">
           Vaciar
         </button>
       </div>

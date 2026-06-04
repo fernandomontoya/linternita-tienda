@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
+import { ToastProvider } from "@/components/Toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -30,9 +31,11 @@ export default function RootLayout({
     <html lang="es" className={`${geistSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-[#FAF7F2]" suppressHydrationWarning>
         <CartProvider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <ToastProvider>
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </ToastProvider>
         </CartProvider>
       </body>
     </html>

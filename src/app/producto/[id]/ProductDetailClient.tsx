@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { DbProduct } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
+import { useToast } from "@/components/Toast";
 import { ShoppingCart, ArrowLeft, MessageCircle, Check, ChevronLeft, ChevronRight } from "lucide-react";
 
 const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23F9F0E6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23C9A84C' font-size='120'%3E%F0%9F%95%AF%EF%B8%8F%3C/text%3E%3C/svg%3E";
@@ -12,6 +13,7 @@ const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg
 export default function ProductDetailClient({ product }: { product: DbProduct }) {
   const router = useRouter();
   const { addItem } = useCart();
+  const { toast } = useToast();
 
   const allImages = (() => {
     const imgs = product.images ?? [];
@@ -39,6 +41,7 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
       unitPrice,
     });
     setAdded(true);
+    toast(`${product.name} agregado al carrito`);
     setTimeout(() => setAdded(false), 2000);
   };
 

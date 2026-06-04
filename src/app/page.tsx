@@ -3,128 +3,185 @@ import Image from "next/image";
 import { getProducts } from "@/lib/products";
 import { categories } from "@/data/products";
 import ProductCardDb from "@/components/ProductCardDb";
-import { ArrowRight, Flame, Leaf, Heart, Gift } from "lucide-react";
+import { ArrowRight, MessageCircle } from "lucide-react";
 
-const features = [
-  { icon: Leaf, title: "Cera de Soya", desc: "100% natural, limpia y sostenible" },
-  { icon: Flame, title: "Aromas Naturales", desc: "Aceites esenciales de la más alta calidad" },
-  { icon: Heart, title: "Hecho a Mano", desc: "Cada vela elaborada con dedicación y amor" },
-  { icon: Gift, title: "Ideal para Regalar", desc: "Sets personalizados para cada ocasión" },
-];
+const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23F9F0E6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23C9A84C' font-size='120'%3E%F0%9F%95%AF%EF%B8%8F%3C/text%3E%3C/svg%3E";
 
 export default async function Home() {
   const featuredProducts = await getProducts({ featured: true });
+  const heroProduct = featuredProducts[0];
+  const heroImg = heroProduct?.images?.[0] || heroProduct?.image_url || PLACEHOLDER;
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#FAF7F2] via-[#F9F0E6] to-[#F2E8D5]">
-        <div className="absolute inset-0 opacity-5 pointer-events-none">
-          <div className="absolute top-20 left-20 w-96 h-96 rounded-full bg-[#C9A84C] blur-3xl" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-[#F2C4CE] blur-3xl" />
-        </div>
+      {/* ── Hero ── */}
+      <section className="relative overflow-hidden bg-[#FAF7F2]">
+        <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-2 min-h-[88vh] items-center gap-8 py-16">
 
-        <div className="relative z-10 max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center py-20">
-          <div>
-            <p className="hero-text text-[#C9A84C] text-xs font-bold tracking-[0.3em] uppercase mb-4">
-              ✦ Velas Artesanales ✦
+          {/* Texto */}
+          <div className="order-2 md:order-1">
+            <p className="hero-text text-[#C9A84C] text-xs font-bold tracking-[0.3em] uppercase mb-5">
+              Hecho a mano en México
             </p>
-            <h1 className="hero-text hero-text-delay-1 text-5xl md:text-6xl font-bold text-[#2C1810] leading-tight mb-6">
-              Ilumina tu hogar con{" "}
-              <span className="text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg, #C9A84C, #E8C97A)" }}>
-                aromas únicos
-              </span>
+            <h1 className="hero-text hero-text-delay-1 text-5xl md:text-[3.75rem] font-bold text-[#2C1810] leading-[1.08] mb-6 tracking-tight">
+              Velas que llenan tu hogar de{" "}
+              <span className="text-[#C9A84C]">aroma y calma</span>
             </h1>
-            <p className="hero-text hero-text-delay-2 text-[#2C1810]/70 text-lg mb-8 leading-relaxed">
-              Velas hechas con amor, cera de soya y los mejores aceites esenciales.
-              Cada pieza es única, elaborada artesanalmente en México.
+            <p className="hero-text hero-text-delay-2 text-[#2C1810]/60 text-lg mb-10 leading-relaxed max-w-md">
+              Cera de soya, aceites esenciales y mucho cariño en cada pieza. Sin químicos, sin prisa.
             </p>
-            <div className="hero-text hero-text-delay-3 flex flex-wrap gap-4">
-              <Link href="/catalogo" className="btn-gold px-8 py-3.5 rounded-full inline-flex items-center gap-2">
-                Ver catálogo <ArrowRight size={16} />
+            <div className="hero-text hero-text-delay-3 flex flex-wrap gap-3">
+              <Link
+                href="/catalogo"
+                className="btn-gold px-7 py-3.5 rounded-full inline-flex items-center gap-2 text-sm font-semibold"
+              >
+                Ver catálogo <ArrowRight size={15} />
               </Link>
               <a
                 href="https://wa.me/5215563442525?text=Hola!%20Me%20interesan%20sus%20velas"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-8 py-3.5 rounded-full border-2 border-[#C9A84C] text-[#C9A84C] font-semibold hover:bg-[#C9A84C] hover:text-white transition-colors duration-200 inline-flex items-center gap-2"
+                className="px-7 py-3.5 rounded-full border border-[#2C1810]/20 text-[#2C1810]/70 text-sm font-medium hover:border-[#C9A84C] hover:text-[#C9A84C] transition-colors duration-200 inline-flex items-center gap-2"
               >
-                Escribir por WhatsApp
+                <MessageCircle size={15} /> WhatsApp
               </a>
             </div>
+
+            {/* Prueba social mínima */}
+            <div className="hero-text hero-text-delay-4 mt-10 flex items-center gap-4">
+              <div className="flex -space-x-2">
+                {["🌸","🕯️","✨"].map((e, i) => (
+                  <div key={i} className="w-8 h-8 rounded-full bg-[#F9F0E6] border-2 border-white flex items-center justify-center text-sm">{e}</div>
+                ))}
+              </div>
+              <p className="text-xs text-[#2C1810]/50">
+                +200 pedidos entregados con amor
+              </p>
+            </div>
           </div>
 
-          <div className="hero-img relative flex justify-center">
-            <div className="w-72 h-72 md:w-96 md:h-96 rounded-full bg-gradient-to-br from-[#F2C4CE]/40 to-[#E8C97A]/30 flex items-center justify-center">
-              <div className="w-56 h-56 md:w-72 md:h-72 rounded-full bg-gradient-to-br from-[#F9F0E6] to-white shadow-2xl flex items-center justify-center overflow-hidden">
-                <Image src="/logo.png" alt="Linternita" width={220} height={220} className="object-contain p-6" />
+          {/* Imagen del producto hero */}
+          <div className="hero-img order-1 md:order-2 relative flex justify-center md:justify-end">
+            <div className="relative w-full max-w-sm md:max-w-none">
+              {/* Mancha de fondo */}
+              <div className="absolute inset-0 -m-8 rounded-[40%_60%_60%_40%/40%_40%_60%_60%] bg-gradient-to-br from-[#F2C4CE]/30 to-[#E8C97A]/20" />
+              <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
+                <Image
+                  src={heroImg}
+                  alt={heroProduct?.name ?? "Vela artesanal Linternita"}
+                  fill
+                  className="object-cover"
+                  priority
+                  unoptimized={!heroProduct?.image_url && !heroProduct?.images?.[0]}
+                />
               </div>
+              {/* Chip flotante */}
+              {heroProduct && (
+                <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl px-4 py-3 shadow-lg border border-[#E8C97A]/30">
+                  <p className="text-[10px] text-[#C9A84C] font-bold uppercase tracking-widest">Más vendido</p>
+                  <p className="text-sm font-semibold text-[#2C1810] mt-0.5">{heroProduct.name}</p>
+                  <p className="text-sm font-bold text-[#C9A84C]">
+                    ${Number(heroProduct.price).toLocaleString("es-MX")}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6">
-          {features.map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="text-center p-6">
-              <div className="w-12 h-12 rounded-full gold-gradient flex items-center justify-center mx-auto mb-4">
-                <Icon size={20} className="text-white" />
+      {/* ── Franja artesanal ── */}
+      <section className="border-y border-[#E8C97A]/30 bg-white py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <p className="text-center text-[#2C1810]/70 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
+            Cada vela es elaborada a mano, una por una. Usamos cera de soya 100% natural,
+            mechas de algodón y aceites esenciales puros. Sin parafina, sin colorantes sintéticos.
+            <span className="text-[#C9A84C] font-semibold"> Eso se huele.</span>
+          </p>
+          <div className="flex justify-center gap-8 mt-6 text-center">
+            {[
+              ["100%", "Cera de soya"],
+              ["0", "Parafina"],
+              ["+30", "Aromas únicos"],
+            ].map(([num, label]) => (
+              <div key={label}>
+                <p className="text-2xl font-bold text-[#C9A84C]">{num}</p>
+                <p className="text-xs text-[#2C1810]/50 mt-0.5">{label}</p>
               </div>
-              <h3 className="font-semibold text-[#2C1810] mb-1">{title}</h3>
-              <p className="text-xs text-[#2C1810]/60">{desc}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Categorías */}
-      <section className="py-16 max-w-6xl mx-auto px-4">
-        <div className="text-center mb-10">
-          <p className="text-[#C9A84C] text-xs font-bold tracking-[0.3em] uppercase mb-2">Explora</p>
-          <h2 className="text-3xl font-bold text-[#2C1810]">Nuestras Categorías</h2>
+      {/* ── Categorías ── */}
+      <section className="py-14 max-w-6xl mx-auto px-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <h2 className="text-2xl font-bold text-[#2C1810]">Explora por tipo</h2>
+          <Link href="/catalogo" className="text-sm text-[#C9A84C] hover:underline font-medium flex items-center gap-1">
+            Ver todo <ArrowRight size={13} />
+          </Link>
         </div>
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="flex flex-wrap gap-2">
           {categories.map((cat) => (
-            <Link key={cat.id} href={`/catalogo?categoria=${cat.id}`}
-              className="px-6 py-2.5 rounded-full border border-[#C9A84C] text-[#C9A84C] font-medium text-sm hover:bg-[#C9A84C] hover:text-white transition-all">
+            <Link
+              key={cat.id}
+              href={`/catalogo?categoria=${cat.id}`}
+              className="px-5 py-2 rounded-full border border-[#E8C97A]/60 text-[#2C1810]/70 font-medium text-sm hover:border-[#C9A84C] hover:text-[#C9A84C] transition-colors duration-150 bg-white"
+            >
               {cat.label}
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Productos destacados */}
+      {/* ── Productos destacados ── */}
       <section className="pb-20 max-w-6xl mx-auto px-4">
-        <div className="text-center mb-10">
-          <p className="text-[#C9A84C] text-xs font-bold tracking-[0.3em] uppercase mb-2">Lo más amado</p>
-          <h2 className="text-3xl font-bold text-[#2C1810]">Productos Destacados</h2>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+          <div>
+            <p className="text-[#C9A84C] text-xs font-bold tracking-[0.3em] uppercase mb-1">Los favoritos</p>
+            <h2 className="text-2xl font-bold text-[#2C1810]">Productos Destacados</h2>
+          </div>
+          <Link href="/catalogo" className="text-sm text-[#C9A84C] hover:underline font-medium flex items-center gap-1">
+            Ver todo el catálogo <ArrowRight size={13} />
+          </Link>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {featuredProducts.slice(0, 4).map((product) => (
             <ProductCardDb key={product.id} product={product} />
           ))}
         </div>
-        <div className="text-center mt-10">
-          <Link href="/catalogo" className="btn-gold px-8 py-3 rounded-full inline-flex items-center gap-2">
-            Ver todo el catálogo <ArrowRight size={16} />
-          </Link>
-        </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-[#2C1810] py-16 text-center">
-        <p className="text-[#C9A84C] text-xs font-bold tracking-[0.3em] uppercase mb-3">Pedidos especiales</p>
-        <h2 className="text-3xl font-bold text-white mb-4">¿Buscas algo personalizado?</h2>
-        <p className="text-white/70 mb-8 max-w-md mx-auto">
-          Creamos velas con aromas, colores y envases a tu medida. Perfectas para bodas, eventos o regalos corporativos.
-        </p>
-        <a href="https://wa.me/5215563442525?text=Hola!%20Quisiera%20un%20pedido%20personalizado"
-          target="_blank" rel="noopener noreferrer"
-          className="btn-gold px-8 py-3.5 rounded-full inline-flex items-center gap-2">
-          Cotizar por WhatsApp <ArrowRight size={16} />
-        </a>
+      {/* ── CTA personalizado ── */}
+      <section className="bg-[#2C1810] py-16">
+        <div className="max-w-4xl mx-auto px-4 grid md:grid-cols-2 gap-10 items-center">
+          <div>
+            <p className="text-[#C9A84C] text-xs font-bold tracking-[0.3em] uppercase mb-3">Para ocasiones especiales</p>
+            <h2 className="text-3xl font-bold text-white mb-4 leading-tight">
+              ¿Quieres algo hecho para ti?
+            </h2>
+            <p className="text-white/60 leading-relaxed">
+              Bodas, XV años, regalos corporativos o simplemente porque quieres algo único.
+              Hacemos velas con tus colores, tus aromas y tu mensaje.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3">
+            <a
+              href="https://wa.me/5215563442525?text=Hola!%20Quisiera%20un%20pedido%20personalizado"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-gold px-7 py-4 rounded-2xl flex items-center justify-center gap-2 font-semibold"
+            >
+              <MessageCircle size={18} /> Cotizar por WhatsApp
+            </a>
+            <Link
+              href="/contacto"
+              className="px-7 py-4 rounded-2xl border border-white/20 text-white/70 font-medium flex items-center justify-center gap-2 hover:border-white/40 hover:text-white transition-colors duration-200 text-sm"
+            >
+              Ver más opciones
+            </Link>
+          </div>
+        </div>
       </section>
     </>
   );

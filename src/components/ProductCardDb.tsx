@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ShoppingCart } from "lucide-react";
 import { DbProduct } from "@/lib/products";
+import { categories } from "@/data/products";
 
 const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect width='400' height='400' fill='%23F9F0E6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23C9A84C' font-size='60'%3E%F0%9F%95%AF%EF%B8%8F%3C/text%3E%3C/svg%3E";
 
@@ -53,7 +54,7 @@ export default function ProductCardDb({ product }: { product: DbProduct }) {
         {/* Info */}
         <div className="p-4">
           <p className="text-[10px] uppercase tracking-widest text-[#C9A84C] font-semibold mb-1">
-            {product.category}
+            {categories.find((c) => c.id === product.category)?.label ?? product.category}
           </p>
           <h3 className="font-semibold text-[#2C1810] mb-1 line-clamp-1 text-[15px]">
             {product.name}

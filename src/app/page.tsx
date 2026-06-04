@@ -26,20 +26,20 @@ export default async function Home() {
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center py-20">
           <div>
-            <p className="text-[#C9A84C] text-xs font-bold tracking-[0.3em] uppercase mb-4">
+            <p className="hero-text text-[#C9A84C] text-xs font-bold tracking-[0.3em] uppercase mb-4">
               ✦ Velas Artesanales ✦
             </p>
-            <h1 className="text-5xl md:text-6xl font-bold text-[#2C1810] leading-tight mb-6">
+            <h1 className="hero-text hero-text-delay-1 text-5xl md:text-6xl font-bold text-[#2C1810] leading-tight mb-6">
               Ilumina tu hogar con{" "}
               <span className="text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg, #C9A84C, #E8C97A)" }}>
                 aromas únicos
               </span>
             </h1>
-            <p className="text-[#2C1810]/70 text-lg mb-8 leading-relaxed">
+            <p className="hero-text hero-text-delay-2 text-[#2C1810]/70 text-lg mb-8 leading-relaxed">
               Velas hechas con amor, cera de soya y los mejores aceites esenciales.
               Cada pieza es única, elaborada artesanalmente en México.
             </p>
-            <div className="flex flex-wrap gap-4">
+            <div className="hero-text hero-text-delay-3 flex flex-wrap gap-4">
               <Link href="/catalogo" className="btn-gold px-8 py-3.5 rounded-full inline-flex items-center gap-2">
                 Ver catálogo <ArrowRight size={16} />
               </Link>
@@ -47,14 +47,14 @@ export default async function Home() {
                 href="https://wa.me/5215563442525?text=Hola!%20Me%20interesan%20sus%20velas"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-8 py-3.5 rounded-full border-2 border-[#C9A84C] text-[#C9A84C] font-semibold hover:bg-[#C9A84C] hover:text-white transition-all inline-flex items-center gap-2"
+                className="px-8 py-3.5 rounded-full border-2 border-[#C9A84C] text-[#C9A84C] font-semibold hover:bg-[#C9A84C] hover:text-white transition-colors duration-200 inline-flex items-center gap-2"
               >
                 Escribir por WhatsApp
               </a>
             </div>
           </div>
 
-          <div className="relative flex justify-center">
+          <div className="hero-img relative flex justify-center">
             <div className="w-72 h-72 md:w-96 md:h-96 rounded-full bg-gradient-to-br from-[#F2C4CE]/40 to-[#E8C97A]/30 flex items-center justify-center">
               <div className="w-56 h-56 md:w-72 md:h-72 rounded-full bg-gradient-to-br from-[#F9F0E6] to-white shadow-2xl flex items-center justify-center overflow-hidden">
                 <Image src="/logo.png" alt="Linternita" width={220} height={220} className="object-contain p-6" />

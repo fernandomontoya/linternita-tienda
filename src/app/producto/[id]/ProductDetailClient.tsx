@@ -142,9 +142,9 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
           <div className="mb-6">
             <p className="text-sm font-semibold text-[#2C1810] mb-2">Cantidad</p>
             <div className="flex items-center gap-3">
-              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-9 h-9 rounded-full border border-[#C9A84C] text-[#C9A84C] font-bold hover:bg-[#C9A84C] hover:text-white transition-all">−</button>
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="qty-btn w-9 h-9 rounded-full border border-[#C9A84C] text-[#C9A84C] font-bold hover:bg-[#C9A84C] hover:text-white">−</button>
               <span className="w-8 text-center font-semibold">{quantity}</span>
-              <button onClick={() => setQuantity(Math.min(product.stock, quantity + 1))} className="w-9 h-9 rounded-full border border-[#C9A84C] text-[#C9A84C] font-bold hover:bg-[#C9A84C] hover:text-white transition-all">+</button>
+              <button onClick={() => setQuantity(Math.min(product.stock, quantity + 1))} className="qty-btn w-9 h-9 rounded-full border border-[#C9A84C] text-[#C9A84C] font-bold hover:bg-[#C9A84C] hover:text-white">+</button>
               <span className="text-xs text-[#2C1810]/50">{product.stock} disponibles</span>
             </div>
           </div>

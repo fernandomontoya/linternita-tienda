@@ -22,7 +22,7 @@ export default function NosotrosPage() {
 
       <div className="grid md:grid-cols-3 gap-8 mb-16">
         {[
-          { icon: Leaf, title: "Ingredientes naturales", desc: "Usamos exclusivamente cera de soya 100% natural y aceites esenciales de la más alta pureza." },
+          { icon: Leaf, title: "Ingredientes naturales", desc: "Usamos ceras naturales de la mejor calidad y aceites esenciales de la más alta pureza." },
           { icon: Heart, title: "Hecho con amor", desc: "Cada vela se elabora a mano, con atención al detalle y cariño en cada paso del proceso." },
           { icon: Star, title: "Diseños únicos", desc: "Creamos piezas irrepetibles: desde las clásicas aromáticas hasta las geódicas de lujo." },
         ].map(({ icon: Icon, title, desc }) => (

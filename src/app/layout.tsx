@@ -13,8 +13,8 @@ const geistSans = Geist({
 
 export const metadata: Metadata = {
   title: "Linternita Velas Artesanales",
-  description: "Velas artesanales hechas con amor en México. Cera de soya, aromas naturales y diseños únicos.",
-  keywords: "velas artesanales, velas de soya, velas aromáticas, México, regalo",
+  description: "Velas artesanales hechas con amor en México. Ceras naturales, aromas puros y diseños únicos.",
+  keywords: "velas artesanales, velas naturales, velas aromáticas, México, regalo",
   openGraph: {
     title: "Linternita Velas Artesanales",
     description: "Velas artesanales hechas con amor en México.",

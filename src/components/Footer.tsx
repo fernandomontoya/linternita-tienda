@@ -27,7 +27,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-sm text-white/50 leading-relaxed max-w-xs">
-              Velas hechas a mano en México con cera de soya, mechas de algodón y aceites esenciales puros.
+              Velas hechas a mano en México con ceras naturales de la mejor calidad y aceites esenciales puros.
             </p>
             <a
               href="https://www.instagram.com/velasartesanales.linternita/"

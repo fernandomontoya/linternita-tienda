@@ -28,7 +28,7 @@ export default async function Home() {
               <span className="text-[#C9A84C]">aroma y calma</span>
             </h1>
             <p className="hero-text hero-text-delay-2 text-[#2C1810]/60 text-lg mb-10 leading-relaxed max-w-md">
-              Cera de soya, aceites esenciales y mucho cariño en cada pieza. Sin químicos, sin prisa.
+              Las mejores ceras naturales, aceites esenciales puros y mucho cariño en cada pieza. Sin químicos, sin prisa.
             </p>
             <div className="hero-text hero-text-delay-3 flex flex-wrap gap-3">
               <Link
@@ -94,13 +94,13 @@ export default async function Home() {
       <section className="border-y border-[#E8C97A]/30 bg-white py-8">
         <div className="max-w-4xl mx-auto px-4">
           <p className="text-center text-[#2C1810]/70 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
-            Cada vela es elaborada a mano, una por una. Usamos cera de soya 100% natural,
+            Cada vela es elaborada a mano, una por una. Usamos ceras naturales de la mejor calidad,
             mechas de algodón y aceites esenciales puros. Sin parafina, sin colorantes sintéticos.
             <span className="text-[#C9A84C] font-semibold"> Eso se huele.</span>
           </p>
           <div className="flex justify-center gap-8 mt-6 text-center">
             {[
-              ["100%", "Cera de soya"],
+              ["100%", "Ceras naturales"],
               ["0", "Parafina"],
               ["+30", "Aromas únicos"],
             ].map(([num, label]) => (

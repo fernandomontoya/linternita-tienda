@@ -1,0 +1,113 @@
+"use client";
+
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { DbProduct } from "@/lib/products";
+import { useCart } from "@/context/CartContext";
+import { ShoppingCart, ArrowLeft, MessageCircle, Check } from "lucide-react";
+
+const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23F9F0E6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23C9A84C' font-size='120'%3E%F0%9F%95%AF%EF%B8%8F%3C/text%3E%3C/svg%3E";
+
+export default function ProductDetailClient({ product }: { product: DbProduct }) {
+  const router = useRouter();
+  const { addItem } = useCart();
+
+  const [selectedAroma, setSelectedAroma] = useState(product.aromas?.[0] ?? "");
+  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0]?.id ?? "");
+  const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
+
+  const sizeModifier = product.sizes?.find((s) => s.id === selectedSize)?.priceModifier ?? 0;
+  const unitPrice = product.price + sizeModifier;
+  const formatted = (p: number) =>
+    new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0 }).format(p);
+
+  const handleAddToCart = () => {
+    addItem({
+      product: { id: product.id, name: product.name, description: product.description, price: product.price, category: product.category as never, image: product.image_url ?? "", stock: product.stock },
+      quantity,
+      selectedAroma: selectedAroma || undefined,
+      selectedSize: product.sizes?.find((s) => s.id === selectedSize)?.name,
+      unitPrice,
+    });
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2000);
+  };
+
+  const whatsappText = encodeURIComponent(
+    `Hola! Me interesa:\n*${product.name}*\n${selectedAroma ? `Aroma: ${selectedAroma}\n` : ""}${selectedSize ? `Tamaño: ${product.sizes?.find((s) => s.id === selectedSize)?.name}\n` : ""}Cantidad: ${quantity}\nPrecio: ${formatted(unitPrice * quantity)}`
+  );
+
+  return (
+    <div className="max-w-5xl mx-auto px-4 py-12">
+      <button onClick={() => router.back()} className="flex items-center gap-2 text-sm text-[#2C1810]/60 hover:text-[#C9A84C] transition-colors mb-8">
+        <ArrowLeft size={16} /> Volver
+      </button>
+
+      <div className="grid md:grid-cols-2 gap-12">
+        <div className="aspect-square rounded-3xl overflow-hidden bg-[#F9F0E6] relative">
+          <Image src={product.image_url || PLACEHOLDER} alt={product.name} fill className="object-cover" unoptimized={!product.image_url} />
+        </div>
+
+        <div className="flex flex-col">
+          <p className="text-[#C9A84C] text-xs font-bold tracking-widest uppercase mb-2">{product.category}</p>
+          <h1 className="text-3xl font-bold text-[#2C1810] mb-3">{product.name}</h1>
+          <p className="text-[#2C1810]/70 leading-relaxed mb-6">{product.description}</p>
+          <p className="text-3xl font-bold text-[#C9A84C] mb-6">{formatted(unitPrice)}</p>
+
+          {product.aromas && product.aromas.length > 0 && (
+            <div className="mb-5">
+              <p className="text-sm font-semibold text-[#2C1810] mb-2">Aroma</p>
+              <div className="flex flex-wrap gap-2">
+                {product.aromas.map((aroma) => (
+                  <button key={aroma} onClick={() => setSelectedAroma(aroma)}
+                    className={`px-4 py-1.5 rounded-full text-sm border transition-all ${selectedAroma === aroma ? "btn-gold border-transparent" : "border-[#C9A84C]/50 text-[#2C1810]/70 hover:border-[#C9A84C]"}`}>
+                    {aroma}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {product.sizes && product.sizes.length > 0 && (
+            <div className="mb-5">
+              <p className="text-sm font-semibold text-[#2C1810] mb-2">Tamaño</p>
+              <div className="flex flex-wrap gap-2">
+                {product.sizes.map((size) => (
+                  <button key={size.id} onClick={() => setSelectedSize(size.id)}
+                    className={`px-4 py-1.5 rounded-full text-sm border transition-all ${selectedSize === size.id ? "btn-gold border-transparent" : "border-[#C9A84C]/50 text-[#2C1810]/70 hover:border-[#C9A84C]"}`}>
+                    {size.name} {size.priceModifier > 0 ? `+${formatted(size.priceModifier)}` : ""}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="mb-6">
+            <p className="text-sm font-semibold text-[#2C1810] mb-2">Cantidad</p>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-9 h-9 rounded-full border border-[#C9A84C] text-[#C9A84C] font-bold hover:bg-[#C9A84C] hover:text-white transition-all">−</button>
+              <span className="w-8 text-center font-semibold">{quantity}</span>
+              <button onClick={() => setQuantity(Math.min(product.stock, quantity + 1))} className="w-9 h-9 rounded-full border border-[#C9A84C] text-[#C9A84C] font-bold hover:bg-[#C9A84C] hover:text-white transition-all">+</button>
+              <span className="text-xs text-[#2C1810]/50">{product.stock} disponibles</span>
+            </div>
+          </div>
+
+          <p className="text-sm text-[#2C1810]/60 mb-4">Total: <span className="font-bold text-[#2C1810]">{formatted(unitPrice * quantity)}</span></p>
+
+          <div className="flex flex-col gap-3">
+            <button onClick={handleAddToCart} disabled={product.stock === 0}
+              className="btn-gold py-3.5 rounded-full flex items-center justify-center gap-2 disabled:opacity-50">
+              {added ? <><Check size={18} /> Agregado</> : <><ShoppingCart size={18} /> Agregar al carrito</>}
+            </button>
+            <a href={`https://wa.me/5215563442525?text=${whatsappText}`} target="_blank" rel="noopener noreferrer"
+              className="py-3.5 rounded-full border-2 border-[#C9A84C] text-[#C9A84C] font-semibold flex items-center justify-center gap-2 hover:bg-[#C9A84C] hover:text-white transition-all">
+              <MessageCircle size={18} /> Pedir por WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,14 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { ShoppingBag, ArrowLeft, AlertCircle, Loader2 } from "lucide-react";
-
-interface FormField { value: string; error: string; touched: boolean; }
-const empty = (): FormField => ({ value: "", error: "", touched: false });
 
 const validators: Record<string, (v: string) => string> = {
   nombre:    (v) => !v.trim() ? "El nombre es requerido" : "",
@@ -18,87 +15,64 @@ const validators: Record<string, (v: string) => string> = {
   direccion: (v) => !v.trim() ? "La dirección es requerida" : v.trim().length < 10 ? "Escribe la dirección completa" : "",
 };
 
-// ─── Field fuera del componente principal para evitar re-montaje ───
-function Field({
-  label, value, error, touched, type = "text", rows,
-  onChange, onBlur,
-}: {
-  label: string;
-  value: string;
-  error: string;
-  touched: boolean;
-  type?: string;
-  rows?: number;
-  onChange: (v: string) => void;
-  onBlur: () => void;
-}) {
-  const hasError = touched && !!error;
-  const base = "w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-colors duration-150";
-  const cls = hasError
-    ? `${base} border-red-300 bg-red-50 focus:border-red-400`
-    : `${base} border-gray-200 focus:border-[#C9A84C] focus:ring-2 focus:ring-[#C9A84C]/10`;
-
-  return (
-    <div>
-      <label className="text-xs font-medium text-[#2C1810]/70 block mb-1.5">
-        {label} <span className="text-[#C9A84C]">*</span>
-      </label>
-      {rows
-        ? <textarea rows={rows} value={value} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} className={`${cls} resize-none`} placeholder={label} />
-        : <input type={type} value={value} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} className={cls} placeholder={label} />
-      }
-      {hasError && (
-        <p className="flex items-center gap-1 mt-1 text-xs text-red-500">
-          <AlertCircle size={11} /> {error}
-        </p>
-      )}
-    </div>
-  );
-}
+const base = "w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-colors duration-150 border-gray-200 focus:border-[#C9A84C] focus:ring-2 focus:ring-[#C9A84C]/10";
+const errCls = "w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none border-red-300 bg-red-50 focus:border-red-400";
 
 export default function CheckoutPage() {
   const { items, total, clearCart } = useCart();
   const router = useRouter();
-  const [fields, setFields] = useState({
-    nombre: empty(), apellido: empty(), email: empty(), telefono: empty(), direccion: empty(),
-  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+
+  // Inputs no controlados — sin re-render al escribir
+  const refs = {
+    nombre:    useRef<HTMLInputElement>(null),
+    apellido:  useRef<HTMLInputElement>(null),
+    email:     useRef<HTMLInputElement>(null),
+    telefono:  useRef<HTMLInputElement>(null),
+    direccion: useRef<HTMLTextAreaElement>(null),
+  };
 
   const fmt = (p: number) =>
     new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0 }).format(p);
 
-  const update = (name: keyof typeof fields, value: string) => {
-    const error = fields[name].touched ? validators[name](value) : "";
-    setFields((f) => ({ ...f, [name]: { value, error, touched: f[name].touched } }));
-  };
+  const getValues = () => ({
+    nombre:    refs.nombre.current?.value ?? "",
+    apellido:  refs.apellido.current?.value ?? "",
+    email:     refs.email.current?.value ?? "",
+    telefono:  refs.telefono.current?.value ?? "",
+    direccion: refs.direccion.current?.value ?? "",
+  });
 
-  const blur = (name: keyof typeof fields) => {
-    const error = validators[name](fields[name].value);
-    setFields((f) => ({ ...f, [name]: { ...f[name], error, touched: true } }));
-  };
-
-  const touchAll = () => {
-    const updated = { ...fields };
-    (Object.keys(fields) as (keyof typeof fields)[]).forEach((k) => {
-      updated[k] = { ...updated[k], error: validators[k](fields[k].value), touched: true };
+  const validateAll = () => {
+    const vals = getValues();
+    const newErrors: Record<string, string> = {};
+    Object.entries(validators).forEach(([k, fn]) => {
+      const err = fn(vals[k as keyof typeof vals]);
+      if (err) newErrors[k] = err;
     });
-    setFields(updated);
-    return Object.entries(updated).every(([k, f]) => !validators[k as keyof typeof fields](f.value));
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const isValid = Object.entries(fields).every(([k, f]) => !validators[k as keyof typeof fields](f.value));
+  const handleBlur = (name: string) => {
+    const val = (refs[name as keyof typeof refs] as React.RefObject<HTMLInputElement | HTMLTextAreaElement>)?.current?.value ?? "";
+    const err = validators[name](val);
+    setErrors((prev) => ({ ...prev, [name]: err }));
+  };
 
   const saveOrder = async (paymentMethod: string) => {
-    if (!touchAll()) return null;
+    if (!validateAll()) return null;
     setSubmitting(true);
+    const vals = getValues();
     const supabase = createClient();
     const { data, error } = await supabase
       .from("orders")
       .insert({
-        customer_name: `${fields.nombre.value} ${fields.apellido.value}`.trim(),
-        customer_email: fields.email.value,
-        customer_phone: fields.telefono.value,
-        customer_address: fields.direccion.value,
+        customer_name: `${vals.nombre} ${vals.apellido}`.trim(),
+        customer_email: vals.email,
+        customer_phone: vals.telefono,
+        customer_address: vals.direccion,
         items: items.map((item) => ({
           id: item.product.id,
           name: item.product.name,
@@ -129,10 +103,11 @@ export default function CheckoutPage() {
   const handleWhatsApp = async () => {
     const order = await saveOrder("whatsapp");
     if (!order) return;
+    const vals = getValues();
     const msg = encodeURIComponent(
       `Hola! Quiero hacer el pedido #${order.order_number}:\n\n` +
       items.map((i) => `• ${i.product.name}${i.selectedAroma ? ` (${i.selectedAroma})` : ""} x${i.quantity} = ${fmt(i.unitPrice * i.quantity)}`).join("\n") +
-      `\n\n*Total: ${fmt(total)}*\n\nMi dirección: ${fields.direccion.value}`
+      `\n\n*Total: ${fmt(total)}*\n\nMi dirección: ${vals.direccion}`
     );
     clearCart();
     router.push(`/pedido/${order.id}?metodo=whatsapp`);
@@ -181,17 +156,42 @@ export default function CheckoutPage() {
         <h2 className="font-semibold text-[#2C1810] mb-5">Tus datos</h2>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Nombre" value={fields.nombre.value} error={fields.nombre.error} touched={fields.nombre.touched}
-              onChange={(v) => update("nombre", v)} onBlur={() => blur("nombre")} />
-            <Field label="Apellido" value={fields.apellido.value} error={fields.apellido.error} touched={fields.apellido.touched}
-              onChange={(v) => update("apellido", v)} onBlur={() => blur("apellido")} />
+            <div>
+              <label className="text-xs font-medium text-[#2C1810]/70 block mb-1.5">Nombre <span className="text-[#C9A84C]">*</span></label>
+              <input ref={refs.nombre} type="text" placeholder="Tu nombre"
+                className={errors.nombre ? errCls : base}
+                onBlur={() => handleBlur("nombre")} />
+              {errors.nombre && <p className="flex items-center gap-1 mt-1 text-xs text-red-500"><AlertCircle size={11} />{errors.nombre}</p>}
+            </div>
+            <div>
+              <label className="text-xs font-medium text-[#2C1810]/70 block mb-1.5">Apellido <span className="text-[#C9A84C]">*</span></label>
+              <input ref={refs.apellido} type="text" placeholder="Tu apellido"
+                className={errors.apellido ? errCls : base}
+                onBlur={() => handleBlur("apellido")} />
+              {errors.apellido && <p className="flex items-center gap-1 mt-1 text-xs text-red-500"><AlertCircle size={11} />{errors.apellido}</p>}
+            </div>
           </div>
-          <Field label="Correo electrónico" type="email" value={fields.email.value} error={fields.email.error} touched={fields.email.touched}
-            onChange={(v) => update("email", v)} onBlur={() => blur("email")} />
-          <Field label="Teléfono / WhatsApp" type="tel" value={fields.telefono.value} error={fields.telefono.error} touched={fields.telefono.touched}
-            onChange={(v) => update("telefono", v)} onBlur={() => blur("telefono")} />
-          <Field label="Dirección de envío" rows={3} value={fields.direccion.value} error={fields.direccion.error} touched={fields.direccion.touched}
-            onChange={(v) => update("direccion", v)} onBlur={() => blur("direccion")} />
+          <div>
+            <label className="text-xs font-medium text-[#2C1810]/70 block mb-1.5">Correo electrónico <span className="text-[#C9A84C]">*</span></label>
+            <input ref={refs.email} type="email" placeholder="tu@correo.com"
+              className={errors.email ? errCls : base}
+              onBlur={() => handleBlur("email")} />
+            {errors.email && <p className="flex items-center gap-1 mt-1 text-xs text-red-500"><AlertCircle size={11} />{errors.email}</p>}
+          </div>
+          <div>
+            <label className="text-xs font-medium text-[#2C1810]/70 block mb-1.5">Teléfono / WhatsApp <span className="text-[#C9A84C]">*</span></label>
+            <input ref={refs.telefono} type="tel" placeholder="55 0000 0000"
+              className={errors.telefono ? errCls : base}
+              onBlur={() => handleBlur("telefono")} />
+            {errors.telefono && <p className="flex items-center gap-1 mt-1 text-xs text-red-500"><AlertCircle size={11} />{errors.telefono}</p>}
+          </div>
+          <div>
+            <label className="text-xs font-medium text-[#2C1810]/70 block mb-1.5">Dirección de envío <span className="text-[#C9A84C]">*</span></label>
+            <textarea ref={refs.direccion} rows={3} placeholder="Calle, número, colonia, ciudad, CP"
+              className={`${errors.direccion ? errCls : base} resize-none`}
+              onBlur={() => handleBlur("direccion")} />
+            {errors.direccion && <p className="flex items-center gap-1 mt-1 text-xs text-red-500"><AlertCircle size={11} />{errors.direccion}</p>}
+          </div>
         </div>
       </div>
 
@@ -210,9 +210,6 @@ export default function CheckoutPage() {
             </svg>
           )} Pedir por WhatsApp
         </button>
-        {!isValid && (
-          <p className="text-xs text-center text-[#2C1810]/40 pt-1">Completa todos los campos para continuar</p>
-        )}
       </div>
     </div>
   );

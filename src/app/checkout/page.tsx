@@ -66,6 +66,7 @@ export default function CheckoutPage() {
     setSubmitting(true);
     const vals = getValues();
     const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
     const { data, error } = await supabase
       .from("orders")
       .insert({
@@ -73,6 +74,7 @@ export default function CheckoutPage() {
         customer_email: vals.email,
         customer_phone: vals.telefono,
         customer_address: vals.direccion,
+        user_id: user?.id ?? null,
         items: items.map((item) => ({
           id: item.product.id,
           name: item.product.name,

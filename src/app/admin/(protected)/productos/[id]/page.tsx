@@ -3,10 +3,14 @@ import ProductForm from "@/components/admin/ProductForm";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
+import { getCategories } from "@/lib/products";
 
 export default async function EditarProductoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = await createClient();
+  const [supabase, categories] = await Promise.all([
+    createClient(),
+    getCategories(),
+  ]);
   const { data: product } = await supabase.from("products").select("*").eq("id", id).single();
 
   if (!product) notFound();
@@ -22,7 +26,7 @@ export default async function EditarProductoPage({ params }: { params: Promise<{
           <p className="text-gray-500 text-sm">{product.name}</p>
         </div>
       </div>
-      <ProductForm initialData={product} />
+      <ProductForm initialData={product} categories={categories} />
     </div>
   );
 }

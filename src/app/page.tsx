@@ -1,14 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getProducts } from "@/lib/products";
-import { categories } from "@/data/products";
+import { getProducts, getCategories } from "@/lib/products";
 import ProductCardDb from "@/components/ProductCardDb";
 import { ArrowRight, MessageCircle } from "lucide-react";
 
 const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23F9F0E6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23C9A84C' font-size='120'%3E%F0%9F%95%AF%EF%B8%8F%3C/text%3E%3C/svg%3E";
 
 export default async function Home() {
-  const featuredProducts = await getProducts({ featured: true });
+  const [featuredProducts, categories] = await Promise.all([
+    getProducts({ featured: true }),
+    getCategories(),
+  ]);
   const heroProduct = featuredProducts[0];
   const heroImg = heroProduct?.images?.[0] || heroProduct?.image_url || PLACEHOLDER;
 

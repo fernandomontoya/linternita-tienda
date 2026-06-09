@@ -1,8 +1,7 @@
-import { getProducts } from "@/lib/products";
-import { categories } from "@/data/products";
+import { getProducts, getCategories } from "@/lib/products";
 import CatalogoClient from "./CatalogoClient";
 
 export default async function CatalogoPage() {
-  const products = await getProducts();
+  const [products, categories] = await Promise.all([getProducts(), getCategories()]);
   return <CatalogoClient products={products} categories={categories} />;
 }

@@ -1,8 +1,11 @@
 import ProductForm from "@/components/admin/ProductForm";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { getCategories } from "@/lib/products";
 
-export default function NuevoProductoPage() {
+export default async function NuevoProductoPage() {
+  const categories = await getCategories();
+
   return (
     <div>
       <div className="flex items-center gap-4 mb-8">
@@ -13,7 +16,7 @@ export default function NuevoProductoPage() {
           <h1 className="text-2xl font-bold text-gray-900">Nuevo producto</h1>
         </div>
       </div>
-      <ProductForm />
+      <ProductForm categories={categories} />
     </div>
   );
 }

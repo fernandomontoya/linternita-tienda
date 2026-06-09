@@ -1,5 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 
+export interface DbCategory {
+  id: string;
+  label: string;
+  sort_order: number;
+}
+
 export interface DbProduct {
   id: string;
   name: string;
@@ -30,4 +36,13 @@ export async function getProduct(id: string) {
   const supabase = await createClient();
   const { data } = await supabase.from("products").select("*").eq("id", id).eq("active", true).single();
   return data as DbProduct | null;
+}
+
+export async function getCategories(): Promise<DbCategory[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("categories")
+    .select("id, label, sort_order")
+    .order("sort_order");
+  return (data ?? []) as DbCategory[];
 }

@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { LogOut, Package, LayoutDashboard, ExternalLink, ShoppingBag } from "lucide-react";
+import { LogOut, Package, LayoutDashboard, ExternalLink, ShoppingBag, Tag } from "lucide-react";
 
 export default function AdminNav({ userEmail }: { userEmail: string }) {
   const router = useRouter();
@@ -21,6 +21,7 @@ export default function AdminNav({ userEmail }: { userEmail: string }) {
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/productos", label: "Productos", icon: Package },
     { href: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag },
+    { href: "/admin/categorias", label: "Categorías", icon: Tag },
   ];
 
   return (

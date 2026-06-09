@@ -22,9 +22,13 @@ interface ProductFormData {
   active: boolean;
 }
 
-const CATEGORIES = ["aromaticas", "decorativas", "relajacion", "regalo", "navidad"];
-
-export default function ProductForm({ initialData }: { initialData?: Partial<ProductFormData & { image_url?: string }> }) {
+export default function ProductForm({
+  initialData,
+  categories = [],
+}: {
+  initialData?: Partial<ProductFormData & { image_url?: string }>;
+  categories?: { id: string; label: string }[];
+}) {
   const router = useRouter();
   const isEditing = !!initialData?.id;
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -172,7 +176,7 @@ export default function ProductForm({ initialData }: { initialData?: Partial<Pro
               <label className="text-xs font-medium text-gray-600 block mb-1">Categoría</label>
               <select value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
                 className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C] bg-white">
-                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                {categories.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
               </select>
             </div>
             <div className="flex gap-6">

@@ -149,7 +149,11 @@ export default async function Home() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {featuredProducts.slice(0, 4).map((product) => (
-            <ProductCardDb key={product.id} product={product} />
+            <ProductCardDb
+                key={product.id}
+                product={product}
+                categoryLabel={categories.find((c) => c.id === product.category)?.label}
+              />
           ))}
         </div>
       </section>

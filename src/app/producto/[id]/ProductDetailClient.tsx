@@ -28,7 +28,12 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
   const [added, setAdded] = useState(false);
 
   const sizeModifier = product.sizes?.find((s) => s.id === selectedSize)?.priceModifier ?? 0;
-  const unitPrice = product.price + sizeModifier;
+  const basePrice = product.price_promo && product.price_promo < product.price
+    ? product.price_promo
+    : product.price;
+  const unitPrice = basePrice + sizeModifier;
+  const hasPromo = !!product.price_promo && product.price_promo < product.price;
+  const discount = hasPromo ? Math.round((1 - product.price_promo! / product.price) * 100) : 0;
   const fmt = (p: number) =>
     new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0 }).format(p);
 
@@ -112,7 +117,21 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
           <p className="text-[#C9A84C] text-xs font-bold tracking-widest uppercase mb-2">{product.category}</p>
           <h1 className="text-3xl font-bold text-[#2C1810] mb-3">{product.name}</h1>
           <p className="text-[#2C1810]/70 leading-relaxed mb-6">{product.description}</p>
-          <p className="text-3xl font-bold text-[#C9A84C] mb-6">{fmt(unitPrice)}</p>
+          <div className="flex items-baseline gap-3 mb-6 flex-wrap">
+            <p className={`text-3xl font-bold ${hasPromo ? "text-red-500" : "text-[#C9A84C]"}`}>
+              {fmt(unitPrice)}
+            </p>
+            {hasPromo && (
+              <>
+                <p className="text-xl text-[#2C1810]/40 line-through font-medium">
+                  {fmt(product.price + sizeModifier)}
+                </p>
+                <span className="bg-red-100 text-red-600 text-xs font-bold px-2.5 py-1 rounded-full">
+                  -{discount}% OFF
+                </span>
+              </>
+            )}
+          </div>
 
           {product.aromas && product.aromas.length > 0 && (
             <div className="mb-5">

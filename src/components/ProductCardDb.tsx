@@ -4,17 +4,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { ShoppingCart } from "lucide-react";
 import { DbProduct } from "@/lib/products";
-import { categories } from "@/data/products";
 
 const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect width='400' height='400' fill='%23F9F0E6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23C9A84C' font-size='60'%3E%F0%9F%95%AF%EF%B8%8F%3C/text%3E%3C/svg%3E";
 
-export default function ProductCardDb({ product }: { product: DbProduct }) {
-  const price = new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    minimumFractionDigits: 0,
-  }).format(product.price);
+const fmt = (p: number) =>
+  new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0 }).format(p);
 
+export default function ProductCardDb({ product, categoryLabel }: { product: DbProduct; categoryLabel?: string }) {
+  const hasPromo = !!product.price_promo && product.price_promo < product.price;
+  const displayPrice = hasPromo ? product.price_promo! : product.price;
+  const discount = hasPromo ? Math.round((1 - product.price_promo! / product.price) * 100) : 0;
   const imgSrc = product.images?.[0] || product.image_url || PLACEHOLDER;
 
   return (
@@ -31,7 +30,14 @@ export default function ProductCardDb({ product }: { product: DbProduct }) {
             unoptimized={!product.image_url && !product.images?.[0]}
           />
 
-          {/* Badges */}
+          {/* Badge de descuento — esquina superior derecha */}
+          {hasPromo && (
+            <span className="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">
+              -{discount}%
+            </span>
+          )}
+
+          {/* Badges stock — esquina superior izquierda */}
           {product.stock === 0 ? (
             <span className="absolute top-3 left-3 bg-gray-400/90 backdrop-blur-sm text-white text-[10px] font-semibold px-2.5 py-1 rounded-full">
               Agotado
@@ -54,7 +60,7 @@ export default function ProductCardDb({ product }: { product: DbProduct }) {
         {/* Info */}
         <div className="p-4">
           <p className="text-[10px] uppercase tracking-widest text-[#C9A84C] font-semibold mb-1">
-            {categories.find((c) => c.id === product.category)?.label ?? product.category}
+            {categoryLabel ?? product.category}
           </p>
           <h3 className="font-semibold text-[#2C1810] mb-1 line-clamp-1 text-[15px]">
             {product.name}
@@ -63,7 +69,16 @@ export default function ProductCardDb({ product }: { product: DbProduct }) {
             {product.description}
           </p>
           <div className="flex items-center justify-between">
-            <span className="text-base font-bold text-[#2C1810]">{price}</span>
+            <div className="flex items-baseline gap-2">
+              <span className={`text-base font-bold ${hasPromo ? "text-red-500" : "text-[#2C1810]"}`}>
+                {fmt(displayPrice)}
+              </span>
+              {hasPromo && (
+                <span className="text-xs text-[#2C1810]/40 line-through font-medium">
+                  {fmt(product.price)}
+                </span>
+              )}
+            </div>
             <span className="text-xs text-[#2C1810]/40 font-medium">
               {product.aromas?.length ? `${product.aromas.length} aromas` : product.sizes?.length ? `${product.sizes.length} tamaños` : ""}
             </span>

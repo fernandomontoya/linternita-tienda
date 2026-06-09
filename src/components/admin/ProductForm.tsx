@@ -13,6 +13,7 @@ interface ProductFormData {
   name: string;
   description: string;
   price: number;
+  price_promo: number | null;
   category: string;
   images: string[];
   aromas: string[];
@@ -47,6 +48,7 @@ export default function ProductForm({
     name: initialData?.name ?? "",
     description: initialData?.description ?? "",
     price: initialData?.price ?? 0,
+    price_promo: (initialData as Partial<ProductFormData & { price_promo?: number | null }>)?.price_promo ?? null,
     category: initialData?.category ?? "aromaticas",
     images: initialImages,
     aromas: initialData?.aromas ?? [],
@@ -171,6 +173,29 @@ export default function ProductForm({
                   onChange={(e) => setForm((f) => ({ ...f, stock: Number(e.target.value) }))}
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C]" />
               </div>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-600 block mb-1">
+                Precio promoción (MXN){" "}
+                <span className="text-gray-400 font-normal">— opcional, deja vacío si no hay oferta</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="number" min={0}
+                  value={form.price_promo ?? ""}
+                  onChange={(e) => setForm((f) => ({ ...f, price_promo: e.target.value === "" ? null : Number(e.target.value) }))}
+                  placeholder="Ej. 220"
+                  className="w-full border border-[#E8C97A] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C] bg-[#FFFBF2]"
+                />
+                {form.price_promo && form.price_promo < form.price && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-green-600 font-semibold bg-green-50 px-2 py-0.5 rounded-full">
+                    -{Math.round((1 - form.price_promo / form.price) * 100)}% desc.
+                  </span>
+                )}
+              </div>
+              {form.price_promo !== null && form.price_promo >= form.price && (
+                <p className="text-xs text-amber-600 mt-1">⚠️ El precio de promoción debe ser menor al precio normal</p>
+              )}
             </div>
             <div>
               <label className="text-xs font-medium text-gray-600 block mb-1">Categoría</label>

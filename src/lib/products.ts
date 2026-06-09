@@ -19,6 +19,7 @@ export interface DbProduct {
   featured: boolean;
   stock: number;
   active: boolean;
+  price_promo: number | null;
 }
 
 export async function getProducts(filters?: { category?: string; featured?: boolean }) {

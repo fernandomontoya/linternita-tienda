@@ -6,6 +6,7 @@ import { ToastProvider } from "@/components/Toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
+import CartReminder from "@/components/CartReminder";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +38,7 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
             <Footer />
             <FloatingCTA />
+            <CartReminder />
           </ToastProvider>
         </CartProvider>
       </body>

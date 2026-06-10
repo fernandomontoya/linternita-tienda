@@ -225,3 +225,9 @@ body {
     transition: none;
   }
 }
+
+/* Protección básica de imágenes de producto */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+}

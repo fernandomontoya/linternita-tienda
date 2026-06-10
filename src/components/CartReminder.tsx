@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useCart } from "@/context/CartContext";
 
-const REMINDER_DELAY = 30 * 60 * 1000; // 30 minutos
+const REMINDER_DELAY = 15 * 60 * 1000; // 15 minutos
 const NOTIFIED_KEY = "linternita-cart-notified";
 const STARTED_AT_KEY = "linternita-cart-started-at";
 

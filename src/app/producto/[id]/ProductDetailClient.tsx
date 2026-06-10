@@ -109,8 +109,8 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
               {allImages.map((url, i) => (
                 <button key={i} onClick={() => setActiveImg(i)}
                   className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${i === activeImg ? "border-[#C9A84C]" : "border-transparent opacity-60 hover:opacity-100"}`}>
-                  <div className="relative w-full h-full">
-                    <Image src={url || PLACEHOLDER} alt={`Foto ${i + 1}`} fill className="object-cover" unoptimized={!url} />
+                  <div className="relative w-full h-full" onContextMenu={(e) => e.preventDefault()}>
+                    <Image src={url || PLACEHOLDER} alt={`Foto ${i + 1}`} fill className="object-cover pointer-events-none select-none" unoptimized={!url} draggable={false} />
                   </div>
                 </button>
               ))}

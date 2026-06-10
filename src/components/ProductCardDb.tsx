@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ShoppingCart } from "lucide-react";
 import { DbProduct } from "@/lib/products";
+import Watermark from "@/components/Watermark";
 
 const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect width='400' height='400' fill='%23F9F0E6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23C9A84C' font-size='60'%3E%F0%9F%95%AF%EF%B8%8F%3C/text%3E%3C/svg%3E";
 
@@ -21,14 +22,16 @@ export default function ProductCardDb({ product, categoryLabel }: { product: DbP
       <div className="card-hover bg-white rounded-2xl overflow-hidden shadow-sm border border-[#E8C97A]/20">
 
         {/* Imagen */}
-        <div className="relative aspect-square bg-[#F9F0E6] overflow-hidden">
+        <div className="relative aspect-square bg-[#F9F0E6] overflow-hidden" onContextMenu={(e) => e.preventDefault()}>
           <Image
             src={imgSrc}
             alt={product.name}
             fill
-            className="object-cover product-img"
+            className="object-cover product-img pointer-events-none select-none"
             unoptimized={!product.image_url && !product.images?.[0]}
+            draggable={false}
           />
+          <Watermark size={36} position="bottom-left" />
 
           {/* Badge de descuento — esquina superior derecha */}
           {hasPromo && (

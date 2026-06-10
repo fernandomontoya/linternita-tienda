@@ -15,7 +15,7 @@ export interface DbProduct {
   image_url: string | null;
   images: string[] | null;
   aromas: string[] | null;
-  sizes: { id: string; name: string; priceModifier: number }[] | null;
+  sizes: { id: string; name: string; priceModifier: number; isPackage?: boolean }[] | null;
   featured: boolean;
   stock: number;
   active: boolean;

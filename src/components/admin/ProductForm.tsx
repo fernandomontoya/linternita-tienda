@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Loader2, Plus, X, Upload, ImageIcon } from "lucide-react";
 import Image from "next/image";
 
-interface Size { id: string; name: string; priceModifier: number; }
+interface Size { id: string; name: string; priceModifier: number; isPackage?: boolean; }
 
 interface ProductFormData {
   id: string;
@@ -59,7 +59,7 @@ export default function ProductForm({
   });
 
   const [newAroma, setNewAroma] = useState("");
-  const [newSize, setNewSize] = useState({ id: "", name: "", priceModifier: 0 });
+  const [newSize, setNewSize] = useState<Size & { id: string }>({ id: "", name: "", priceModifier: 0, isPackage: false });
   const [loading, setLoading] = useState(false);
   const [uploadingCount, setUploadingCount] = useState(0);
   const [error, setError] = useState("");
@@ -137,7 +137,7 @@ export default function ProductForm({
   const addSize = () => {
     if (newSize.name.trim()) {
       setForm((f) => ({ ...f, sizes: [...f.sizes, { ...newSize, id: slugify(newSize.name) }] }));
-      setNewSize({ id: "", name: "", priceModifier: 0 });
+      setNewSize({ id: "", name: "", priceModifier: 0, isPackage: false });
     }
   };
 
@@ -288,22 +288,38 @@ export default function ProductForm({
           {/* Tamaños */}
           <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
             <h2 className="font-semibold text-gray-900 mb-4">Tamaños / variantes</h2>
-            <div className="grid grid-cols-[1fr_80px_40px] gap-2 mb-2">
+            <div className="grid grid-cols-[1fr_100px_40px] gap-2 mb-2">
               <input value={newSize.name} onChange={(e) => setNewSize((s) => ({ ...s, name: e.target.value }))}
                 placeholder="Ej: Grande (350g)"
                 className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#C9A84C]" />
               <input type="number" value={newSize.priceModifier} onChange={(e) => setNewSize((s) => ({ ...s, priceModifier: Number(e.target.value) }))}
-                placeholder="+$"
+                placeholder={newSize.isPackage ? "Precio total" : "+$"}
                 className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#C9A84C]" />
               <button type="button" onClick={addSize} className="btn-gold px-2 py-2 rounded-xl flex items-center justify-center"><Plus size={16} /></button>
             </div>
-            <p className="text-xs text-gray-400 mb-3">Precio adicional (0 = precio base)</p>
+            <label className="flex items-center gap-2 cursor-pointer mb-3">
+              <input type="checkbox" checked={!!newSize.isPackage}
+                onChange={(e) => setNewSize((s) => ({ ...s, isPackage: e.target.checked }))}
+                className="w-4 h-4 accent-[#C9A84C]" />
+              <span className="text-xs text-gray-600">Es un kit/paquete (el precio de arriba es el precio total, no un adicional)</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-3">
+              {newSize.isPackage
+                ? "El precio que pongas será el precio FINAL de este kit, sin importar el precio base."
+                : "Precio adicional sobre el precio base (0 = precio base)."}
+            </p>
             <div className="space-y-2">
               {form.sizes.map((size) => (
                 <div key={size.id} className="flex items-center justify-between bg-gray-50 rounded-xl px-3 py-2">
-                  <span className="text-sm text-gray-700">{size.name}</span>
+                  <span className="text-sm text-gray-700">
+                    {size.name} {size.isPackage && <span className="text-[10px] uppercase tracking-wide text-[#C9A84C] font-semibold ml-1">Kit</span>}
+                  </span>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-[#C9A84C] font-semibold">{size.priceModifier > 0 ? `+$${size.priceModifier}` : "Precio base"}</span>
+                    <span className="text-xs text-[#C9A84C] font-semibold">
+                      {size.isPackage
+                        ? `$${size.priceModifier} (total)`
+                        : size.priceModifier > 0 ? `+$${size.priceModifier}` : "Precio base"}
+                    </span>
                     <button type="button" onClick={() => setForm((f) => ({ ...f, sizes: f.sizes.filter((s) => s.id !== size.id) }))} className="text-gray-400 hover:text-red-500"><X size={14} /></button>
                   </div>
                 </div>

@@ -28,12 +28,13 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
-  const sizeModifier = product.sizes?.find((s) => s.id === selectedSize)?.priceModifier ?? 0;
+  const selectedSizeObj = product.sizes?.find((s) => s.id === selectedSize);
+  const sizeModifier = selectedSizeObj?.priceModifier ?? 0;
   const basePrice = product.price_promo && product.price_promo < product.price
     ? product.price_promo
     : product.price;
-  const unitPrice = basePrice + sizeModifier;
-  const hasPromo = !!product.price_promo && product.price_promo < product.price;
+  const unitPrice = selectedSizeObj?.isPackage ? sizeModifier : basePrice + sizeModifier;
+  const hasPromo = !selectedSizeObj?.isPackage && !!product.price_promo && product.price_promo < product.price;
   const discount = hasPromo ? Math.round((1 - product.price_promo! / product.price) * 100) : 0;
   const fmt = (p: number) =>
     new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0 }).format(p);
@@ -130,7 +131,7 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
             {hasPromo && (
               <>
                 <p className="text-xl text-[#2C1810]/40 line-through font-medium">
-                  {fmt(product.price + sizeModifier)}
+                  {fmt(product.price + (selectedSizeObj?.isPackage ? 0 : sizeModifier))}
                 </p>
                 <span className="bg-red-100 text-red-600 text-xs font-bold px-2.5 py-1 rounded-full">
                   -{discount}% OFF
@@ -160,7 +161,7 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
                 {product.sizes.map((size) => (
                   <button key={size.id} onClick={() => setSelectedSize(size.id)}
                     className={`px-4 py-1.5 rounded-full text-sm border transition-all ${selectedSize === size.id ? "btn-gold border-transparent" : "border-[#C9A84C]/50 text-[#2C1810]/70 hover:border-[#C9A84C]"}`}>
-                    {size.name} {size.priceModifier > 0 ? `+${fmt(size.priceModifier)}` : ""}
+                    {size.name} {size.isPackage ? fmt(size.priceModifier) : size.priceModifier > 0 ? `+${fmt(size.priceModifier)}` : ""}
                   </button>
                 ))}
               </div>

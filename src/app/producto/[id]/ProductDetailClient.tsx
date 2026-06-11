@@ -22,13 +22,22 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
     return imgs.length > 0 ? imgs : [product.image_url ?? ""];
   })();
 
+  // Si todas las variantes son kits/paquetes, agregamos "Pieza individual" al precio base
+  const sizes = (() => {
+    const list = product.sizes ?? [];
+    if (list.length > 0 && list.every((s) => s.isPackage)) {
+      return [{ id: "individual", name: "Pieza individual", priceModifier: 0, isPackage: false }, ...list];
+    }
+    return list;
+  })();
+
   const [activeImg, setActiveImg] = useState(0);
   const [selectedAroma, setSelectedAroma] = useState(product.aromas?.[0] ?? "");
-  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0]?.id ?? "");
+  const [selectedSize, setSelectedSize] = useState(sizes[0]?.id ?? "");
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
-  const selectedSizeObj = product.sizes?.find((s) => s.id === selectedSize);
+  const selectedSizeObj = sizes?.find((s) => s.id === selectedSize);
   const sizeModifier = selectedSizeObj?.priceModifier ?? 0;
   const basePrice = product.price_promo && product.price_promo < product.price
     ? product.price_promo
@@ -44,7 +53,7 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
       product: { id: product.id, name: product.name, description: product.description, price: product.price, category: product.category as never, image: allImages[0] ?? "", stock: product.stock },
       quantity,
       selectedAroma: selectedAroma || undefined,
-      selectedSize: product.sizes?.find((s) => s.id === selectedSize)?.name,
+      selectedSize: sizes?.find((s) => s.id === selectedSize)?.name,
       unitPrice,
     });
     setAdded(true);
@@ -53,7 +62,7 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
   };
 
   const whatsappText = encodeURIComponent(
-    `Hola! Me interesa:\n*${product.name}*\n${selectedAroma ? `Aroma: ${selectedAroma}\n` : ""}${selectedSize ? `Tamaño: ${product.sizes?.find((s) => s.id === selectedSize)?.name}\n` : ""}Cantidad: ${quantity}\nPrecio: ${fmt(unitPrice * quantity)}`
+    `Hola! Me interesa:\n*${product.name}*\n${selectedAroma ? `Aroma: ${selectedAroma}\n` : ""}${selectedSize ? `Tamaño: ${sizes?.find((s) => s.id === selectedSize)?.name}\n` : ""}Cantidad: ${quantity}\nPrecio: ${fmt(unitPrice * quantity)}`
   );
 
   return (
@@ -154,11 +163,11 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
             </div>
           )}
 
-          {product.sizes && product.sizes.length > 0 && (
+          {sizes && sizes.length > 0 && (
             <div className="mb-5">
               <p className="text-sm font-semibold text-[#2C1810] mb-2">Tamaño</p>
               <div className="flex flex-wrap gap-2">
-                {product.sizes.map((size) => (
+                {sizes.map((size) => (
                   <button key={size.id} onClick={() => setSelectedSize(size.id)}
                     className={`px-4 py-1.5 rounded-full text-sm border transition-all ${selectedSize === size.id ? "btn-gold border-transparent" : "border-[#C9A84C]/50 text-[#2C1810]/70 hover:border-[#C9A84C]"}`}>
                     {size.name} {size.isPackage ? fmt(size.priceModifier) : size.priceModifier > 0 ? `+${fmt(size.priceModifier)}` : ""}

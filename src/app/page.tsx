@@ -64,7 +64,7 @@ export default async function Home() {
 
           {/* Imagen del producto hero */}
           <div className="hero-img order-1 md:order-2 relative flex justify-center md:justify-end">
-            <div className="relative w-full max-w-sm md:max-w-none">
+            <Link href={heroProduct ? `/producto/${heroProduct.id}` : "/catalogo"} className="relative w-full max-w-sm md:max-w-none group block">
               {/* Mancha de fondo */}
               <div className="absolute inset-0 -m-8 rounded-[40%_60%_60%_40%/40%_40%_60%_60%] bg-gradient-to-br from-[#F2C4CE]/30 to-[#E8C97A]/20" />
               <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
@@ -72,14 +72,14 @@ export default async function Home() {
                   src={heroImg}
                   alt={heroProduct?.name ?? "Vela artesanal Linternita"}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                   priority
                   unoptimized={!heroProduct?.image_url && !heroProduct?.images?.[0]}
                 />
               </div>
               {/* Chip flotante */}
               {heroProduct && (
-                <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl px-4 py-3 shadow-lg border border-[#E8C97A]/30">
+                <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl px-4 py-3 shadow-lg border border-[#E8C97A]/30 transition-transform duration-200 group-hover:-translate-y-0.5">
                   <p className="text-[10px] text-[#C9A84C] font-bold uppercase tracking-widest">Más vendido</p>
                   <p className="text-sm font-semibold text-[#2C1810] mt-0.5">{heroProduct.name}</p>
                   <p className="text-sm font-bold text-[#C9A84C]">
@@ -87,7 +87,7 @@ export default async function Home() {
                   </p>
                 </div>
               )}
-            </div>
+            </Link>
           </div>
         </div>
       </section>

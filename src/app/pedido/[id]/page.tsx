@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { CheckCircle, MessageCircle, Package } from "lucide-react";
+import { CheckCircle, Package } from "lucide-react";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { notFound } from "next/navigation";
 
 export default async function PedidoConfirmacionPage({
@@ -85,7 +86,7 @@ export default async function PedidoConfirmacionPage({
             rel="noopener noreferrer"
             className="w-full py-3.5 rounded-xl border-2 border-[#25D366] text-[#25D366] font-semibold flex items-center justify-center gap-2 hover:bg-[#25D366] hover:text-white transition-colors"
           >
-            <MessageCircle size={18} /> Contactar por WhatsApp
+            <WhatsAppIcon size={18} /> Contactar por WhatsApp
           </a>
         )}
         <Link href="/catalogo" className="btn-gold w-full py-3.5 rounded-xl flex items-center justify-center gap-2 font-semibold">

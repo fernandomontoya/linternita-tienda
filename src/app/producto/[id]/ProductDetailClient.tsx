@@ -6,7 +6,8 @@ import { useState } from "react";
 import { DbProduct } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/components/Toast";
-import { ShoppingCart, ArrowLeft, MessageCircle, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { ShoppingCart, ArrowLeft, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Watermark from "@/components/Watermark";
 
 const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23F9F0E6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23C9A84C' font-size='120'%3E%F0%9F%95%AF%EF%B8%8F%3C/text%3E%3C/svg%3E";
@@ -196,7 +197,7 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
             </button>
             <a href={`https://wa.me/5215563442525?text=${whatsappText}`} target="_blank" rel="noopener noreferrer"
               className="py-3.5 rounded-full border-2 border-[#C9A84C] text-[#C9A84C] font-semibold flex items-center justify-center gap-2 hover:bg-[#C9A84C] hover:text-white transition-all">
-              <MessageCircle size={18} /> Pedir por WhatsApp
+              <WhatsAppIcon size={18} /> Pedir por WhatsApp
             </a>
           </div>
         </div>

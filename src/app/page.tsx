@@ -2,7 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { getProducts, getCategories } from "@/lib/products";
 import ProductCardDb from "@/components/ProductCardDb";
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 
 const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23F9F0E6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23C9A84C' font-size='120'%3E%F0%9F%95%AF%EF%B8%8F%3C/text%3E%3C/svg%3E";
 
@@ -45,7 +46,7 @@ export default async function Home() {
                 rel="noopener noreferrer"
                 className="px-7 py-3.5 rounded-full border border-[#2C1810]/20 text-[#2C1810]/70 text-sm font-medium hover:border-[#C9A84C] hover:text-[#C9A84C] transition-colors duration-200 inline-flex items-center gap-2"
               >
-                <MessageCircle size={15} /> WhatsApp
+                <WhatsAppIcon size={15} /> WhatsApp
               </a>
             </div>
 
@@ -178,7 +179,7 @@ export default async function Home() {
               rel="noopener noreferrer"
               className="btn-gold px-7 py-4 rounded-2xl flex items-center justify-center gap-2 font-semibold"
             >
-              <MessageCircle size={18} /> Cotizar por WhatsApp
+              <WhatsAppIcon size={18} /> Cotizar por WhatsApp
             </a>
             <Link
               href="/contacto"

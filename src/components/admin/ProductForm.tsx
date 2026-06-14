@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, Plus, X, Upload, ImageIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface Size { id: string; name: string; priceModifier: number; isPackage?: boolean; }
 
@@ -26,9 +27,11 @@ interface ProductFormData {
 export default function ProductForm({
   initialData,
   categories = [],
+  aromaCatalog = [],
 }: {
   initialData?: Partial<ProductFormData & { image_url?: string }>;
   categories?: { id: string; label: string }[];
+  aromaCatalog?: { id: string; label: string }[];
 }) {
   const router = useRouter();
   const isEditing = !!initialData?.id;
@@ -58,7 +61,6 @@ export default function ProductForm({
     active: initialData?.active ?? true,
   });
 
-  const [newAroma, setNewAroma] = useState("");
   const [newSize, setNewSize] = useState<Size & { id: string }>({ id: "", name: "", priceModifier: 0, isPackage: false });
   const [loading, setLoading] = useState(false);
   const [uploadingCount, setUploadingCount] = useState(0);
@@ -127,11 +129,13 @@ export default function ProductForm({
     router.refresh();
   };
 
-  const addAroma = () => {
-    if (newAroma.trim() && !form.aromas.includes(newAroma.trim())) {
-      setForm((f) => ({ ...f, aromas: [...f.aromas, newAroma.trim()] }));
-      setNewAroma("");
-    }
+  const toggleAroma = (label: string) => {
+    setForm((f) => ({
+      ...f,
+      aromas: f.aromas.includes(label)
+        ? f.aromas.filter((a) => a !== label)
+        : [...f.aromas, label],
+    }));
   };
 
   const addSize = () => {
@@ -266,23 +270,39 @@ export default function ProductForm({
         <div className="space-y-5">
           {/* Aromas */}
           <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-            <h2 className="font-semibold text-gray-900 mb-4">Aromas disponibles</h2>
-            <div className="flex gap-2 mb-3">
-              <input value={newAroma} onChange={(e) => setNewAroma(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addAroma())}
-                placeholder="Ej: Lavanda con vainilla"
-                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#C9A84C]" />
-              <button type="button" onClick={addAroma} className="btn-gold px-3 py-2 rounded-xl"><Plus size={16} /></button>
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="font-semibold text-gray-900">Aromas disponibles</h2>
+              <Link href="/admin/aromas" className="text-xs text-[#C9A84C] hover:underline font-medium">
+                Gestionar catálogo
+              </Link>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {form.aromas.map((aroma) => (
-                <span key={aroma} className="flex items-center gap-1 bg-[#F9F0E6] text-[#8B6914] text-xs px-3 py-1 rounded-full">
-                  {aroma}
-                  <button type="button" onClick={() => setForm((f) => ({ ...f, aromas: f.aromas.filter((a) => a !== aroma) }))}><X size={12} /></button>
-                </span>
-              ))}
-              {form.aromas.length === 0 && <p className="text-xs text-gray-400">Sin aromas</p>}
-            </div>
+            <p className="text-xs text-gray-400 mb-3">Selecciona los aromas que aplican a este producto.</p>
+            {aromaCatalog.length === 0 ? (
+              <p className="text-xs text-gray-400">
+                No hay aromas en el catálogo.{" "}
+                <Link href="/admin/aromas" className="text-[#C9A84C] hover:underline font-medium">Agrega algunos aquí</Link>.
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {aromaCatalog.map((aroma) => {
+                  const active = form.aromas.includes(aroma.label);
+                  return (
+                    <button
+                      key={aroma.id}
+                      type="button"
+                      onClick={() => toggleAroma(aroma.label)}
+                      className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                        active
+                          ? "bg-[#C9A84C] text-white border-[#C9A84C]"
+                          : "bg-white text-gray-600 border-gray-200 hover:border-[#C9A84C]"
+                      }`}
+                    >
+                      {aroma.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Tamaños */}

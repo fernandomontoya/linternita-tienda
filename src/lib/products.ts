@@ -6,6 +6,12 @@ export interface DbCategory {
   sort_order: number;
 }
 
+export interface DbAroma {
+  id: string;
+  label: string;
+  sort_order: number;
+}
+
 export interface DbProduct {
   id: string;
   name: string;
@@ -46,4 +52,14 @@ export async function getCategories(): Promise<DbCategory[]> {
     .select("id, label, sort_order")
     .order("sort_order");
   return (data ?? []) as DbCategory[];
+}
+
+export async function getAromas(): Promise<DbAroma[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("aromas")
+    .select("id, label, sort_order")
+    .order("sort_order")
+    .order("label");
+  return (data ?? []) as DbAroma[];
 }

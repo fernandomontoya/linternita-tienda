@@ -1,10 +1,10 @@
 import ProductForm from "@/components/admin/ProductForm";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { getCategories } from "@/lib/products";
+import { getCategories, getAromas } from "@/lib/products";
 
 export default async function NuevoProductoPage() {
-  const categories = await getCategories();
+  const [categories, aromaCatalog] = await Promise.all([getCategories(), getAromas()]);
 
   return (
     <div>
@@ -16,7 +16,7 @@ export default async function NuevoProductoPage() {
           <h1 className="text-2xl font-bold text-gray-900">Nuevo producto</h1>
         </div>
       </div>
-      <ProductForm categories={categories} />
+      <ProductForm categories={categories} aromaCatalog={aromaCatalog} />
     </div>
   );
 }

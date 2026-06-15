@@ -3,12 +3,21 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 import { Product } from "@/data/products";
 
+export interface EventDetails {
+  ribbonColor?: string;
+  cardColor?: string;
+  eventName?: string;
+  eventDate?: string;
+  phrase?: string;
+}
+
 export interface CartItem {
   product: Product;
   quantity: number;
   selectedAroma?: string;
   selectedSize?: string;
   unitPrice: number;
+  eventDetails?: EventDetails;
 }
 
 interface CartContextType {
@@ -52,7 +61,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         (i) =>
           i.product.id === newItem.product.id &&
           i.selectedAroma === newItem.selectedAroma &&
-          i.selectedSize === newItem.selectedSize
+          i.selectedSize === newItem.selectedSize &&
+          JSON.stringify(i.eventDetails ?? null) === JSON.stringify(newItem.eventDetails ?? null)
       );
       if (existingIndex >= 0) {
         const updated = [...prev];

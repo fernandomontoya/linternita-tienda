@@ -15,6 +15,7 @@ export default async function AdminPedidoDetallePage({ params }: { params: Promi
 
   const items = order.items as {
     name: string; quantity: number; unitPrice: number; subtotal: number; aroma?: string; size?: string;
+    eventDetails?: { ribbonColor?: string; cardColor?: string; eventName?: string; eventDate?: string; phrase?: string };
   }[];
 
   const methodLabel: Record<string, string> = {
@@ -53,6 +54,15 @@ export default async function AdminPedidoDetallePage({ params }: { params: Promi
                 <p className="text-xs text-gray-400">
                   {[item.aroma, item.size].filter(Boolean).join(" · ")} · {item.quantity} pieza{item.quantity > 1 ? "s" : ""}
                 </p>
+                {item.eventDetails && (
+                  <div className="text-xs text-[#C9A84C] mt-1 space-y-0.5">
+                    {item.eventDetails.ribbonColor && <p>🎀 Listón: {item.eventDetails.ribbonColor}</p>}
+                    {item.eventDetails.cardColor && <p>🎴 Tarjeta: {item.eventDetails.cardColor}</p>}
+                    {item.eventDetails.eventName && <p>🎉 Evento: {item.eventDetails.eventName}</p>}
+                    {item.eventDetails.eventDate && <p>📅 Fecha: {item.eventDetails.eventDate}</p>}
+                    {item.eventDetails.phrase && <p>💬 Frase: "{item.eventDetails.phrase}"</p>}
+                  </div>
+                )}
               </div>
               <p className="text-sm font-semibold text-gray-700">{fmt(item.subtotal)}</p>
             </div>

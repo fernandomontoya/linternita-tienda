@@ -103,6 +103,7 @@ export default function CheckoutClient({ userEmail, defaultValues }: { userEmail
           aroma: item.selectedAroma,
           size: item.selectedSize,
           subtotal: item.unitPrice * item.quantity,
+          eventDetails: item.eventDetails,
         })),
         total,
         payment_method: paymentMethod,
@@ -122,7 +123,18 @@ export default function CheckoutClient({ userEmail, defaultValues }: { userEmail
     const vals = getValues();
     const msg = encodeURIComponent(
       `Hola! Quiero hacer el pedido #${order.order_number}:\n\n` +
-      items.map((i) => `• ${i.product.name}${i.selectedAroma ? ` (${i.selectedAroma})` : ""} x${i.quantity} = ${fmt(i.unitPrice * i.quantity)}`).join("\n") +
+      items.map((i) => {
+        let line = `• ${i.product.name}${i.selectedAroma ? ` (${i.selectedAroma})` : ""} x${i.quantity} = ${fmt(i.unitPrice * i.quantity)}`;
+        if (i.eventDetails) {
+          const d = i.eventDetails;
+          if (d.ribbonColor) line += `\n   Listón: ${d.ribbonColor}`;
+          if (d.cardColor) line += `\n   Tarjeta: ${d.cardColor}`;
+          if (d.eventName) line += `\n   Evento: ${d.eventName}`;
+          if (d.eventDate) line += `\n   Fecha: ${d.eventDate}`;
+          if (d.phrase) line += `\n   Frase: ${d.phrase}`;
+        }
+        return line;
+      }).join("\n") +
       `\n\n*Total: ${fmt(total)}*\n\nMi dirección: ${vals.direccion}`
     );
     clearCart();

@@ -3,8 +3,8 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { DbProduct } from "@/lib/products";
-import { useCart } from "@/context/CartContext";
+import { DbProduct, DbColor } from "@/lib/products";
+import { useCart, EventDetails } from "@/context/CartContext";
 import { useToast } from "@/components/Toast";
 import { ShoppingCart, ArrowLeft, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
@@ -12,7 +12,15 @@ import Watermark from "@/components/Watermark";
 
 const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23F9F0E6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23C9A84C' font-size='120'%3E%F0%9F%95%AF%EF%B8%8F%3C/text%3E%3C/svg%3E";
 
-export default function ProductDetailClient({ product }: { product: DbProduct }) {
+export default function ProductDetailClient({
+  product,
+  ribbonColors = [],
+  cardColors = [],
+}: {
+  product: DbProduct;
+  ribbonColors?: DbColor[];
+  cardColors?: DbColor[];
+}) {
   const router = useRouter();
   const { addItem } = useCart();
   const { toast } = useToast();
@@ -38,6 +46,17 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
+  const isEvento = product.category === "eventos";
+  const [ribbonColor, setRibbonColor] = useState(ribbonColors[0]?.label ?? "");
+  const [cardColor, setCardColor] = useState(cardColors[0]?.label ?? "");
+  const [eventName, setEventName] = useState("");
+  const [eventDate, setEventDate] = useState("");
+  const [phrase, setPhrase] = useState("");
+
+  const eventDetails: EventDetails | undefined = isEvento
+    ? { ribbonColor, cardColor, eventName, eventDate, phrase }
+    : undefined;
+
   const selectedSizeObj = sizes?.find((s) => s.id === selectedSize);
   const sizeModifier = selectedSizeObj?.priceModifier ?? 0;
   const basePrice = product.price_promo && product.price_promo < product.price
@@ -56,6 +75,7 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
       selectedAroma: selectedAroma || undefined,
       selectedSize: sizes?.find((s) => s.id === selectedSize)?.name,
       unitPrice,
+      eventDetails,
     });
     setAdded(true);
     toast(`${product.name} agregado al carrito`);
@@ -63,7 +83,7 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
   };
 
   const whatsappText = encodeURIComponent(
-    `Hola! Me interesa:\n*${product.name}*\n${selectedAroma ? `Aroma: ${selectedAroma}\n` : ""}${selectedSize ? `Tamaño: ${sizes?.find((s) => s.id === selectedSize)?.name}\n` : ""}Cantidad: ${quantity}\nPrecio: ${fmt(unitPrice * quantity)}`
+    `Hola! Me interesa:\n*${product.name}*\n${selectedAroma ? `Aroma: ${selectedAroma}\n` : ""}${selectedSize ? `Tamaño: ${sizes?.find((s) => s.id === selectedSize)?.name}\n` : ""}${isEvento ? `Listón: ${ribbonColor}\nTarjeta: ${cardColor}\n${eventName ? `Evento: ${eventName}\n` : ""}${eventDate ? `Fecha: ${eventDate}\n` : ""}${phrase ? `Frase: ${phrase}\n` : ""}` : ""}Cantidad: ${quantity}\nPrecio: ${fmt(unitPrice * quantity)}`
   );
 
   return (
@@ -181,6 +201,65 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
                     {size.name} {size.isPackage ? fmt(size.priceModifier) : size.priceModifier > 0 ? `+${fmt(size.priceModifier)}` : ""}
                   </button>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {isEvento && (
+            <div className="mb-5 p-4 rounded-2xl border border-[#E8C97A]/40 bg-[#FAF7F2] space-y-4">
+              <p className="text-sm font-bold text-[#2C1810]">Personaliza para tu evento 🎉</p>
+
+              {ribbonColors.length > 0 && (
+                <div>
+                  <p className="text-sm font-semibold text-[#2C1810] mb-2">Color de listón</p>
+                  <div className="flex flex-wrap gap-2">
+                    {ribbonColors.map((c) => (
+                      <button key={c.id} type="button" onClick={() => setRibbonColor(c.label)}
+                        title={c.label}
+                        className={`w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center ${ribbonColor === c.label ? "border-[#C9A84C] scale-110" : "border-transparent"}`}>
+                        <span className="w-7 h-7 rounded-full border border-black/10" style={{ backgroundColor: c.hex }} />
+                      </button>
+                    ))}
+                  </div>
+                  {ribbonColor && <p className="text-xs text-[#2C1810]/50 mt-1">Seleccionado: {ribbonColor}</p>}
+                </div>
+              )}
+
+              {cardColors.length > 0 && (
+                <div>
+                  <p className="text-sm font-semibold text-[#2C1810] mb-2">Color de tarjeta</p>
+                  <div className="flex flex-wrap gap-2">
+                    {cardColors.map((c) => (
+                      <button key={c.id} type="button" onClick={() => setCardColor(c.label)}
+                        title={c.label}
+                        className={`w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center ${cardColor === c.label ? "border-[#C9A84C] scale-110" : "border-transparent"}`}>
+                        <span className="w-7 h-7 rounded-full border border-black/10" style={{ backgroundColor: c.hex }} />
+                      </button>
+                    ))}
+                  </div>
+                  {cardColor && <p className="text-xs text-[#2C1810]/50 mt-1">Seleccionado: {cardColor}</p>}
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm font-semibold text-[#2C1810] mb-1.5 block">Evento</label>
+                  <input value={eventName} onChange={(e) => setEventName(e.target.value)}
+                    placeholder="Ej. Mi bautizo"
+                    className="w-full border border-[#E8C97A]/60 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#C9A84C] bg-white" />
+                </div>
+                <div>
+                  <label className="text-sm font-semibold text-[#2C1810] mb-1.5 block">Fecha del evento</label>
+                  <input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)}
+                    className="w-full border border-[#E8C97A]/60 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#C9A84C] bg-white" />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-[#2C1810] mb-1.5 block">Frase para la tarjeta (opcional)</label>
+                <textarea value={phrase} onChange={(e) => setPhrase(e.target.value)} rows={2}
+                  placeholder="Ej. Gracias por acompañarnos en este día tan especial"
+                  className="w-full border border-[#E8C97A]/60 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#C9A84C] bg-white resize-none" />
               </div>
             </div>
           )}

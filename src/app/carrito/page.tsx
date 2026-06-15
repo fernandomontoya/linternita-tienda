@@ -24,10 +24,18 @@ export default function CarritoPage() {
   const whatsappSummary = encodeURIComponent(
     "Hola! Quisiera hacer el siguiente pedido:\n\n" +
       items
-        .map(
-          (item) =>
-            `• ${item.product.name}${item.selectedAroma ? ` (${item.selectedAroma})` : ""}${item.selectedSize ? ` — ${item.selectedSize}` : ""} x${item.quantity} = ${formatted(item.unitPrice * item.quantity)}`
-        )
+        .map((item) => {
+          let line = `• ${item.product.name}${item.selectedAroma ? ` (${item.selectedAroma})` : ""}${item.selectedSize ? ` — ${item.selectedSize}` : ""} x${item.quantity} = ${formatted(item.unitPrice * item.quantity)}`;
+          if (item.eventDetails) {
+            const d = item.eventDetails;
+            if (d.ribbonColor) line += `\n   Listón: ${d.ribbonColor}`;
+            if (d.cardColor) line += `\n   Tarjeta: ${d.cardColor}`;
+            if (d.eventName) line += `\n   Evento: ${d.eventName}`;
+            if (d.eventDate) line += `\n   Fecha: ${d.eventDate}`;
+            if (d.phrase) line += `\n   Frase: ${d.phrase}`;
+          }
+          return line;
+        })
         .join("\n") +
       `\n\n*Total: ${formatted(total)}*`
   );
@@ -77,6 +85,15 @@ export default function CarritoPage() {
                 <p className="font-semibold text-[#2C1810]">{item.product.name}</p>
                 {item.selectedAroma && <p className="text-xs text-[#2C1810]/60">Aroma: {item.selectedAroma}</p>}
                 {item.selectedSize && <p className="text-xs text-[#2C1810]/60">Tamaño: {item.selectedSize}</p>}
+                {item.eventDetails && (
+                  <div className="text-xs text-[#2C1810]/60 mt-1 space-y-0.5">
+                    {item.eventDetails.ribbonColor && <p>🎀 Listón: {item.eventDetails.ribbonColor}</p>}
+                    {item.eventDetails.cardColor && <p>🎴 Tarjeta: {item.eventDetails.cardColor}</p>}
+                    {item.eventDetails.eventName && <p>🎉 Evento: {item.eventDetails.eventName}</p>}
+                    {item.eventDetails.eventDate && <p>📅 Fecha: {item.eventDetails.eventDate}</p>}
+                    {item.eventDetails.phrase && <p>💬 Frase: {item.eventDetails.phrase}</p>}
+                  </div>
+                )}
                 <p className="text-sm font-bold text-[#C9A84C] mt-1">{formatted(item.unitPrice)}</p>
                 <div className="flex items-center gap-2 mt-2">
                   <button

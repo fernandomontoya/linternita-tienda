@@ -28,6 +28,7 @@ export default async function PedidoConfirmacionPage({
 
   const items = order.items as {
     name: string; quantity: number; unitPrice: number; aroma?: string; size?: string; subtotal: number;
+    eventDetails?: { ribbonColor?: string; cardColor?: string; eventName?: string; eventDate?: string; phrase?: string };
   }[];
 
   return (
@@ -54,12 +55,23 @@ export default async function PedidoConfirmacionPage({
         </div>
         <div className="space-y-2 mb-4">
           {items.map((item, i) => (
-            <div key={i} className="flex justify-between text-sm">
-              <span className="text-[#2C1810]/70">
-                {item.name} x{item.quantity}
-                {item.aroma ? ` — ${item.aroma}` : ""}
-              </span>
-              <span className="font-medium">{fmt(item.subtotal)}</span>
+            <div key={i} className="text-sm">
+              <div className="flex justify-between">
+                <span className="text-[#2C1810]/70">
+                  {item.name} x{item.quantity}
+                  {item.aroma ? ` — ${item.aroma}` : ""}
+                </span>
+                <span className="font-medium">{fmt(item.subtotal)}</span>
+              </div>
+              {item.eventDetails && (
+                <div className="text-xs text-[#2C1810]/50 mt-1 space-y-0.5">
+                  {item.eventDetails.ribbonColor && <p>🎀 Listón: {item.eventDetails.ribbonColor}</p>}
+                  {item.eventDetails.cardColor && <p>🎴 Tarjeta: {item.eventDetails.cardColor}</p>}
+                  {item.eventDetails.eventName && <p>🎉 Evento: {item.eventDetails.eventName}</p>}
+                  {item.eventDetails.eventDate && <p>📅 Fecha: {item.eventDetails.eventDate}</p>}
+                  {item.eventDetails.phrase && <p>💬 Frase: {item.eventDetails.phrase}</p>}
+                </div>
+              )}
             </div>
           ))}
         </div>

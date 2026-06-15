@@ -12,6 +12,13 @@ export interface DbAroma {
   sort_order: number;
 }
 
+export interface DbColor {
+  id: string;
+  label: string;
+  hex: string;
+  sort_order: number;
+}
+
 export interface DbProduct {
   id: string;
   name: string;
@@ -64,4 +71,24 @@ export async function getAromas(): Promise<DbAroma[]> {
     .order("sort_order")
     .order("label");
   return (data ?? []) as DbAroma[];
+}
+
+export async function getRibbonColors(): Promise<DbColor[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("ribbon_colors")
+    .select("id, label, hex, sort_order")
+    .order("sort_order")
+    .order("label");
+  return (data ?? []) as DbColor[];
+}
+
+export async function getCardColors(): Promise<DbColor[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("card_colors")
+    .select("id, label, hex, sort_order")
+    .order("sort_order")
+    .order("label");
+  return (data ?? []) as DbColor[];
 }

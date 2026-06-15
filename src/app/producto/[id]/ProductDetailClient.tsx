@@ -53,6 +53,12 @@ export default function ProductDetailClient({
   const [eventDate, setEventDate] = useState("");
   const [phrase, setPhrase] = useState("");
 
+  const minEventDate = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 15);
+    return d.toISOString().split("T")[0];
+  })();
+
   const eventDetails: EventDetails | undefined = isEvento
     ? { ribbonColor, cardColor, eventName, eventDate, phrase }
     : undefined;
@@ -251,7 +257,9 @@ export default function ProductDetailClient({
                 <div>
                   <label className="text-sm font-semibold text-[#2C1810] mb-1.5 block">Fecha del evento</label>
                   <input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)}
+                    min={minEventDate}
                     className="w-full border border-[#E8C97A]/60 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#C9A84C] bg-white" />
+                  <p className="text-[10px] text-[#2C1810]/40 mt-1">Necesitamos al menos 15 días de anticipación</p>
                 </div>
               </div>
 

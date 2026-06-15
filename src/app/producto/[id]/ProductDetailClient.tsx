@@ -259,7 +259,6 @@ export default function ProductDetailClient({
                   <input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)}
                     min={minEventDate}
                     className="w-full border border-[#E8C97A]/60 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#C9A84C] bg-white" />
-                  <p className="text-[10px] text-[#2C1810]/40 mt-1">Necesitamos al menos 15 días de anticipación</p>
                 </div>
               </div>
 

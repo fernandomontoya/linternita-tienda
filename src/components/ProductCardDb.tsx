@@ -71,6 +71,11 @@ export default function ProductCardDb({ product, categoryLabel }: { product: DbP
           <p className="text-xs text-[#2C1810]/55 line-clamp-2 mb-3 leading-relaxed">
             {product.description}
           </p>
+          {(product.width_cm || product.height_cm) && (
+            <p className="text-[10px] text-[#2C1810]/40 mb-2">
+              📏 {product.width_cm ?? "?"} × {product.height_cm ?? "?"} cm
+            </p>
+          )}
           <div className="flex items-center justify-between">
             <div className="flex items-baseline gap-2">
               <span className={`text-base font-bold ${hasPromo ? "text-red-500" : "text-[#2C1810]"}`}>

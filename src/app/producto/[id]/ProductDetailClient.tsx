@@ -134,6 +134,13 @@ export default function ProductDetailClient({ product }: { product: DbProduct })
           <p className="text-[#C9A84C] text-xs font-bold tracking-widest uppercase mb-2">{product.category}</p>
           <h1 className="text-3xl font-bold text-[#2C1810] mb-3">{product.name}</h1>
           <p className="text-[#2C1810]/70 leading-relaxed mb-6">{product.description}</p>
+
+          {(product.width_cm || product.height_cm) && (
+            <p className="text-sm text-[#2C1810]/60 mb-6">
+              📏 Medidas: <span className="font-medium text-[#2C1810]">{product.width_cm ?? "?"} cm (ancho) × {product.height_cm ?? "?"} cm (alto)</span>
+            </p>
+          )}
+
           <div className="flex items-baseline gap-3 mb-6 flex-wrap">
             <p className={`text-3xl font-bold ${hasPromo ? "text-red-500" : "text-[#C9A84C]"}`}>
               {fmt(unitPrice)}

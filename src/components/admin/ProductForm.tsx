@@ -22,6 +22,8 @@ interface ProductFormData {
   featured: boolean;
   stock: number;
   active: boolean;
+  width_cm: number | null;
+  height_cm: number | null;
 }
 
 export default function ProductForm({
@@ -59,6 +61,8 @@ export default function ProductForm({
     featured: initialData?.featured ?? false,
     stock: initialData?.stock ?? 0,
     active: initialData?.active ?? true,
+    width_cm: (initialData as Partial<ProductFormData & { width_cm?: number | null }>)?.width_cm ?? null,
+    height_cm: (initialData as Partial<ProductFormData & { height_cm?: number | null }>)?.height_cm ?? null,
   });
 
   const [newSize, setNewSize] = useState<Size & { id: string }>({ id: "", name: "", priceModifier: 0, isPackage: false });
@@ -175,6 +179,26 @@ export default function ProductForm({
                 <label className="text-xs font-medium text-gray-600 block mb-1">Stock *</label>
                 <input required type="number" min={0} value={form.stock}
                   onChange={(e) => setForm((f) => ({ ...f, stock: Number(e.target.value) }))}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C]" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-medium text-gray-600 block mb-1">
+                  Ancho (cm) <span className="text-gray-400 font-normal">— opcional</span>
+                </label>
+                <input type="number" min={0} step="0.1" value={form.width_cm ?? ""}
+                  onChange={(e) => setForm((f) => ({ ...f, width_cm: e.target.value === "" ? null : Number(e.target.value) }))}
+                  placeholder="Ej. 8"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C]" />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-600 block mb-1">
+                  Alto (cm) <span className="text-gray-400 font-normal">— opcional</span>
+                </label>
+                <input type="number" min={0} step="0.1" value={form.height_cm ?? ""}
+                  onChange={(e) => setForm((f) => ({ ...f, height_cm: e.target.value === "" ? null : Number(e.target.value) }))}
+                  placeholder="Ej. 12"
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C]" />
               </div>
             </div>

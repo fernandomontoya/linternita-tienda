@@ -26,6 +26,8 @@ export interface DbProduct {
   stock: number;
   active: boolean;
   price_promo: number | null;
+  width_cm: number | null;
+  height_cm: number | null;
 }
 
 export async function getProducts(filters?: { category?: string; featured?: boolean }) {

@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
 import CartReminder from "@/components/CartReminder";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +40,7 @@ export default function RootLayout({
             <Footer />
             <FloatingCTA />
             <CartReminder />
+            <Analytics />
           </ToastProvider>
         </CartProvider>
       </body>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getProducts, getCategories } from "@/lib/products";
-import ProductCardDb from "@/components/ProductCardDb";
+import FeaturedCarousel from "@/components/FeaturedCarousel";
 import { ArrowRight } from "lucide-react";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 
@@ -148,15 +148,7 @@ export default async function Home() {
             Ver todo el catálogo <ArrowRight size={13} />
           </Link>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {featuredProducts.slice(0, 4).map((product) => (
-            <ProductCardDb
-                key={product.id}
-                product={product}
-                categoryLabel={categories.find((c) => c.id === product.category)?.label}
-              />
-          ))}
-        </div>
+        <FeaturedCarousel products={featuredProducts} categories={categories} />
       </section>
 
       {/* ── CTA personalizado ── */}

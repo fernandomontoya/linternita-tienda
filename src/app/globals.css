@@ -231,3 +231,7 @@ img {
   -webkit-user-drag: none;
   user-select: none;
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

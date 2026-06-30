@@ -1,20 +1,15 @@
 import Link from "next/link";
-import Image from "next/image";
 import { getProducts, getCategories } from "@/lib/products";
 import FeaturedCarousel from "@/components/FeaturedCarousel";
+import HeroCarousel from "@/components/HeroCarousel";
 import { ArrowRight } from "lucide-react";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
-
-const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23F9F0E6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23C9A84C' font-size='120'%3E%F0%9F%95%AF%EF%B8%8F%3C/text%3E%3C/svg%3E";
 
 export default async function Home() {
   const [featuredProducts, categories] = await Promise.all([
     getProducts({ featured: true }),
     getCategories(),
   ]);
-  const heroProduct = featuredProducts[0];
-  const heroImg = heroProduct?.images?.[0] || heroProduct?.image_url || PLACEHOLDER;
-
   return (
     <>
       {/* ── Hero ── */}
@@ -65,30 +60,7 @@ export default async function Home() {
 
           {/* Imagen del producto hero */}
           <div className="hero-img order-1 md:order-2 relative flex justify-center md:justify-end">
-            <Link href={heroProduct ? `/producto/${heroProduct.id}` : "/catalogo"} className="relative w-full max-w-sm md:max-w-none group block">
-              {/* Mancha de fondo */}
-              <div className="absolute inset-0 -m-8 rounded-[40%_60%_60%_40%/40%_40%_60%_60%] bg-gradient-to-br from-[#F2C4CE]/30 to-[#E8C97A]/20" />
-              <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
-                <Image
-                  src={heroImg}
-                  alt={heroProduct?.name ?? "Vela artesanal Linternita"}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                  priority
-                  unoptimized={!heroProduct?.image_url && !heroProduct?.images?.[0]}
-                />
-              </div>
-              {/* Chip flotante */}
-              {heroProduct && (
-                <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl px-4 py-3 shadow-lg border border-[#E8C97A]/30 transition-transform duration-200 group-hover:-translate-y-0.5">
-                  <p className="text-[10px] text-[#C9A84C] font-bold uppercase tracking-widest">Más vendido</p>
-                  <p className="text-sm font-semibold text-[#2C1810] mt-0.5">{heroProduct.name}</p>
-                  <p className="text-sm font-bold text-[#C9A84C]">
-                    ${Number(heroProduct.price).toLocaleString("es-MX")}
-                  </p>
-                </div>
-              )}
-            </Link>
+            <HeroCarousel products={featuredProducts} />
           </div>
         </div>
       </section>

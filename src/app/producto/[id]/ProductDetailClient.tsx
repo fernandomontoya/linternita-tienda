@@ -45,7 +45,8 @@ export default function ProductDetailClient({
 
   const isEvento = product.category === "eventos";
   const [ribbonColor, setRibbonColor] = useState(ribbonColors[0]?.label ?? "");
-  const [cardColor, setCardColor] = useState(cardColors[0]?.label ?? "");
+  // Color de tarjeta deshabilitado temporalmente — no se usa por ahora
+  const cardColor = "";
   const [eventName, setEventName] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [phrase, setPhrase] = useState("");
@@ -86,7 +87,7 @@ export default function ProductDetailClient({
   };
 
   const whatsappText = encodeURIComponent(
-    `Hola! Me interesa:\n*${product.name}*\n${selectedAroma ? `Aroma: ${selectedAroma}\n` : ""}${selectedSize ? `Tamaño: ${sizes?.find((s) => s.id === selectedSize)?.name}\n` : ""}${isEvento ? `Listón: ${ribbonColor}\nTarjeta: ${cardColor}\n${eventName ? `Evento: ${eventName}\n` : ""}${eventDate ? `Fecha: ${eventDate}\n` : ""}${phrase ? `Frase: ${phrase}\n` : ""}` : ""}Cantidad: ${quantity}\nPrecio: ${fmt(unitPrice * quantity)}`
+    `Hola! Me interesa:\n*${product.name}*\n${selectedAroma ? `Aroma: ${selectedAroma}\n` : ""}${selectedSize ? `Tamaño: ${sizes?.find((s) => s.id === selectedSize)?.name}\n` : ""}${isEvento ? `Listón: ${ribbonColor}\n${cardColor ? `Tarjeta: ${cardColor}\n` : ""}${eventName ? `Evento: ${eventName}\n` : ""}${eventDate ? `Fecha: ${eventDate}\n` : ""}${phrase ? `Frase: ${phrase}\n` : ""}` : ""}Cantidad: ${quantity}\nPrecio: ${fmt(unitPrice * quantity)}`
   );
 
   return (
@@ -232,21 +233,7 @@ export default function ProductDetailClient({
                 </div>
               )}
 
-              {cardColors.length > 0 && (
-                <div>
-                  <p className="text-sm font-semibold text-[#2C1810] mb-2">Color de tarjeta</p>
-                  <div className="flex flex-wrap gap-2">
-                    {cardColors.map((c) => (
-                      <button key={c.id} type="button" onClick={() => setCardColor(c.label)}
-                        title={c.label}
-                        className={`w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center ${cardColor === c.label ? "border-[#C9A84C] scale-110" : "border-transparent"}`}>
-                        <span className="w-7 h-7 rounded-full border border-black/10" style={{ backgroundColor: c.hex }} />
-                      </button>
-                    ))}
-                  </div>
-                  {cardColor && <p className="text-xs text-[#2C1810]/50 mt-1">Seleccionado: {cardColor}</p>}
-                </div>
-              )}
+              {/* Color de tarjeta oculto temporalmente — no se usa por ahora */}
 
               <div className="grid grid-cols-2 gap-3">
                 <div>

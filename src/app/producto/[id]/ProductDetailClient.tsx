@@ -6,9 +6,10 @@ import { useState } from "react";
 import { DbProduct, DbColor } from "@/lib/products";
 import { useCart, EventDetails } from "@/context/CartContext";
 import { useToast } from "@/components/Toast";
-import { ShoppingCart, ArrowLeft, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { ShoppingCart, ArrowLeft, Check, ChevronLeft, ChevronRight, Expand } from "lucide-react";
 import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Watermark from "@/components/Watermark";
+import ImageLightbox from "@/components/ImageLightbox";
 
 const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Crect width='600' height='600' fill='%23F9F0E6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23C9A84C' font-size='120'%3E%F0%9F%95%AF%EF%B8%8F%3C/text%3E%3C/svg%3E";
 
@@ -41,6 +42,7 @@ export default function ProductDetailClient({
   })();
 
   const [activeImg, setActiveImg] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedAroma, setSelectedAroma] = useState(product.aromas?.[0] ?? "");
   const [selectedSize, setSelectedSize] = useState(sizes[0]?.id ?? "");
   const [quantity, setQuantity] = useState(1);
@@ -103,28 +105,32 @@ export default function ProductDetailClient({
         <div className="space-y-3">
           {/* Imagen principal */}
           <div
-            className="relative aspect-square rounded-3xl overflow-hidden bg-[#F9F0E6] group"
+            className="relative aspect-square rounded-3xl overflow-hidden bg-[#F9F0E6] group cursor-zoom-in"
             onContextMenu={(e) => e.preventDefault()}
+            onClick={() => setLightboxOpen(true)}
           >
             <Image
               src={allImages[activeImg] || PLACEHOLDER}
               alt={product.name}
               fill
-              className="object-cover transition-opacity duration-200 pointer-events-none select-none"
+              className="object-cover transition-opacity duration-200 select-none"
               unoptimized={!allImages[activeImg]}
               draggable={false}
             />
             <Watermark />
+            <div className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <Expand size={16} className="text-[#2C1810]/70" />
+            </div>
             {allImages.length > 1 && (
               <>
                 <button
-                  onClick={() => setActiveImg((i) => (i - 1 + allImages.length) % allImages.length)}
+                  onClick={(e) => { e.stopPropagation(); setActiveImg((i) => (i - 1 + allImages.length) % allImages.length); }}
                   className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 hover:bg-white shadow flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   <ChevronLeft size={18} />
                 </button>
                 <button
-                  onClick={() => setActiveImg((i) => (i + 1) % allImages.length)}
+                  onClick={(e) => { e.stopPropagation(); setActiveImg((i) => (i + 1) % allImages.length); }}
                   className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 hover:bg-white shadow flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   <ChevronRight size={18} />
@@ -132,7 +138,7 @@ export default function ProductDetailClient({
                 {/* Dots */}
                 <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                   {allImages.map((_, i) => (
-                    <button key={i} onClick={() => setActiveImg(i)}
+                    <button key={i} onClick={(e) => { e.stopPropagation(); setActiveImg(i); }}
                       className={`w-2 h-2 rounded-full transition-all ${i === activeImg ? "bg-[#C9A84C] w-4" : "bg-white/70"}`} />
                   ))}
                 </div>
@@ -295,6 +301,16 @@ export default function ProductDetailClient({
           </div>
         </div>
       </div>
+
+      {lightboxOpen && (
+        <ImageLightbox
+          images={allImages.filter(Boolean).length > 0 ? allImages : [PLACEHOLDER]}
+          activeIndex={activeImg}
+          alt={product.name}
+          onClose={() => setLightboxOpen(false)}
+          onNavigate={setActiveImg}
+        />
+      )}
     </div>
   );
 }

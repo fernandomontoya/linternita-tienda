@@ -32,16 +32,9 @@ export default function ProductDetailClient({
     return imgs.length > 0 ? imgs : [product.image_url ?? ""];
   })();
 
-  // Si todas las variantes son kits/paquetes y hay un precio base configurado,
-  // agregamos "Pieza individual" al precio base. Si el precio base es 0 (eliminado),
-  // el producto solo se vende por kit y no debe mostrarse esta opción.
-  const sizes = (() => {
-    const list = product.sizes ?? [];
-    if (list.length > 0 && list.every((s) => s.isPackage) && product.price > 0) {
-      return [{ id: "individual", name: "Pieza individual", priceModifier: 0, isPackage: false }, ...list];
-    }
-    return list;
-  })();
+  // No se agrega una opción de "pieza individual" automática: si el producto
+  // solo tiene variantes de kit/paquete, se vende exclusivamente por kit.
+  const sizes = product.sizes ?? [];
 
   const [activeImg, setActiveImg] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);

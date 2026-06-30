@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const FROM_EMAIL = "Linternita Velas <pedidos@notificaciones.linternita.mx>";
+const FROM_EMAIL = "Linternita Velas <pedidos@linternita.com.mx>";
 const FALLBACK_FROM_EMAIL = "Linternita Velas <onboarding@resend.dev>";
 const ADMIN_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL ?? "fernando.montoya84@outlook.com";
 

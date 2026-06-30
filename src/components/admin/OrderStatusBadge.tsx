@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
@@ -16,9 +17,22 @@ const STATUSES = [
 export default function OrderStatusBadge({ status, orderId }: { status: string; orderId: string }) {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState(status);
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
+  const [mounted, setMounted] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
 
+  useEffect(() => setMounted(true), []);
+
   const s = STATUSES.find((s) => s.value === current) ?? STATUSES[0];
+
+  const handleToggle = () => {
+    if (!open && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setMenuPos({ top: rect.bottom + 4, left: rect.left + rect.width / 2 });
+    }
+    setOpen((o) => !o);
+  };
 
   const handleChange = async (newStatus: string) => {
     setOpen(false);
@@ -31,16 +45,20 @@ export default function OrderStatusBadge({ status, orderId }: { status: string; 
   return (
     <div className="relative inline-block">
       <button
-        onClick={() => setOpen(!open)}
+        ref={buttonRef}
+        onClick={handleToggle}
         className={`text-[11px] font-semibold px-2.5 py-1 rounded-full cursor-pointer hover:opacity-80 transition-opacity ${s.color}`}
       >
         {s.label} ▾
       </button>
 
-      {open && (
+      {open && mounted && createPortal(
         <>
-          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute z-20 top-full mt-1 left-1/2 -translate-x-1/2 bg-white rounded-xl border border-gray-100 shadow-lg py-1 min-w-[130px]">
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div
+            className="fixed z-50 -translate-x-1/2 bg-white rounded-xl border border-gray-100 shadow-lg py-1 min-w-[130px]"
+            style={{ top: menuPos.top, left: menuPos.left }}
+          >
             {STATUSES.map((st) => (
               <button
                 key={st.value}
@@ -51,7 +69,8 @@ export default function OrderStatusBadge({ status, orderId }: { status: string; 
               </button>
             ))}
           </div>
-        </>
+        </>,
+        document.body
       )}
     </div>
   );

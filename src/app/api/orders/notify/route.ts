@@ -3,7 +3,7 @@ import { Resend } from "resend";
 
 const FROM_EMAIL = "Linternita Velas <pedidos@notificaciones.linternita.mx>";
 const FALLBACK_FROM_EMAIL = "Linternita Velas <onboarding@resend.dev>";
-const ADMIN_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL ?? "laugomezc8@gmail.com";
+const ADMIN_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL ?? "fernando.montoya84@outlook.com";
 
 interface OrderItem {
   name: string;

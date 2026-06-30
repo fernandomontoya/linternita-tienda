@@ -87,6 +87,17 @@ export default function CheckoutClient({ userEmail, defaultValues }: { userEmail
       });
     }
 
+    const orderItems = items.map((item) => ({
+      id: item.product.id,
+      name: item.product.name,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      aroma: item.selectedAroma,
+      size: item.selectedSize,
+      subtotal: item.unitPrice * item.quantity,
+      eventDetails: item.eventDetails,
+    }));
+
     const { data, error } = await supabase
       .from("orders")
       .insert({
@@ -95,16 +106,7 @@ export default function CheckoutClient({ userEmail, defaultValues }: { userEmail
         customer_phone: vals.telefono,
         customer_address: vals.direccion,
         user_id: user?.id ?? null,
-        items: items.map((item) => ({
-          id: item.product.id,
-          name: item.product.name,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          aroma: item.selectedAroma,
-          size: item.selectedSize,
-          subtotal: item.unitPrice * item.quantity,
-          eventDetails: item.eventDetails,
-        })),
+        items: orderItems,
         total,
         payment_method: paymentMethod,
         status: "pendiente",
@@ -114,6 +116,24 @@ export default function CheckoutClient({ userEmail, defaultValues }: { userEmail
 
     setSubmitting(false);
     if (error || !data) return null;
+
+    // Notificar por email (no bloquea el flujo si falla)
+    fetch("/api/orders/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        orderId: data.id,
+        orderNumber: data.order_number,
+        customerName: `${vals.nombre} ${vals.apellido}`.trim(),
+        customerEmail: vals.email,
+        customerPhone: vals.telefono,
+        customerAddress: vals.direccion,
+        items: orderItems,
+        total,
+        paymentMethod,
+      }),
+    }).catch((err) => console.error("Error notificando pedido por email:", err));
+
     return data;
   };
 

@@ -58,7 +58,7 @@ export default function ContactoPage() {
         </a>
 
         <a
-          href="mailto:linternita@gmail.com"
+          href="mailto:contacto@linternita.com.mx"
           className="flex items-center gap-4 bg-white rounded-2xl p-5 border border-[#E8C97A]/20 shadow-sm hover:border-[#C9A84C]/50 transition-all"
         >
           <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 text-blue-500">
@@ -66,7 +66,7 @@ export default function ContactoPage() {
           </div>
           <div>
             <p className="font-semibold text-[#2C1810]">Correo</p>
-            <p className="text-sm text-[#2C1810]/60">linternita@gmail.com</p>
+            <p className="text-sm text-[#2C1810]/60">contacto@linternita.com.mx</p>
           </div>
         </a>
       </div>

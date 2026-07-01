@@ -6,6 +6,7 @@ import { Product } from "@/data/products";
 export interface EventDetails {
   ribbonColor?: string;
   cardColor?: string;
+  presentationType?: string;
   eventName?: string;
   eventDate?: string;
   phrase?: string;

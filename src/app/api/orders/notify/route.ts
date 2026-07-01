@@ -15,6 +15,7 @@ interface OrderItem {
   eventDetails?: {
     ribbonColor?: string;
     cardColor?: string;
+    presentationType?: string;
     eventName?: string;
     eventDate?: string;
     phrase?: string;
@@ -43,6 +44,7 @@ function itemsHtml(items: OrderItem[]) {
       const event = item.eventDetails;
       const eventLines = event
         ? [
+            event.presentationType ? `🎁 Presentación: ${event.presentationType}` : "",
             event.ribbonColor ? `🎀 Listón: ${event.ribbonColor}` : "",
             event.eventName ? `🎉 Evento: ${event.eventName}` : "",
             event.eventDate ? `📅 Fecha: ${event.eventDate}` : "",

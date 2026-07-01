@@ -43,10 +43,13 @@ export default function ProductDetailClient({
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
+  const PRESENTATION_TYPES = ["Caja", "Bolsa de Celofán", "Tull"];
+
   const isEvento = product.category === "eventos";
   const [ribbonColor, setRibbonColor] = useState(ribbonColors[0]?.label ?? "");
   // Color de tarjeta deshabilitado temporalmente — no se usa por ahora
   const cardColor = "";
+  const [presentationType, setPresentationType] = useState(PRESENTATION_TYPES[0]);
   const [eventName, setEventName] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [phrase, setPhrase] = useState("");
@@ -58,7 +61,7 @@ export default function ProductDetailClient({
   })();
 
   const eventDetails: EventDetails | undefined = isEvento
-    ? { ribbonColor, cardColor, eventName, eventDate, phrase }
+    ? { ribbonColor, cardColor, presentationType, eventName, eventDate, phrase }
     : undefined;
 
   const selectedSizeObj = sizes?.find((s) => s.id === selectedSize);
@@ -87,7 +90,7 @@ export default function ProductDetailClient({
   };
 
   const whatsappText = encodeURIComponent(
-    `Hola! Me interesa:\n*${product.name}*\n${selectedAroma ? `Aroma: ${selectedAroma}\n` : ""}${selectedSize ? `Tamaño: ${sizes?.find((s) => s.id === selectedSize)?.name}\n` : ""}${isEvento ? `Listón: ${ribbonColor}\n${cardColor ? `Tarjeta: ${cardColor}\n` : ""}${eventName ? `Evento: ${eventName}\n` : ""}${eventDate ? `Fecha: ${eventDate}\n` : ""}${phrase ? `Frase: ${phrase}\n` : ""}` : ""}Cantidad: ${quantity}\nPrecio: ${fmt(unitPrice * quantity)}`
+    `Hola! Me interesa:\n*${product.name}*\n${selectedAroma ? `Aroma: ${selectedAroma}\n` : ""}${selectedSize ? `Tamaño: ${sizes?.find((s) => s.id === selectedSize)?.name}\n` : ""}${isEvento ? `Presentación: ${presentationType}\nListón: ${ribbonColor}\n${cardColor ? `Tarjeta: ${cardColor}\n` : ""}${eventName ? `Evento: ${eventName}\n` : ""}${eventDate ? `Fecha: ${eventDate}\n` : ""}${phrase ? `Frase: ${phrase}\n` : ""}` : ""}Cantidad: ${quantity}\nPrecio: ${fmt(unitPrice * quantity)}`
   );
 
   return (
@@ -234,6 +237,18 @@ export default function ProductDetailClient({
               )}
 
               {/* Color de tarjeta oculto temporalmente — no se usa por ahora */}
+
+              <div>
+                <p className="text-sm font-semibold text-[#2C1810] mb-2">Tipo de presentación</p>
+                <div className="flex flex-wrap gap-2">
+                  {PRESENTATION_TYPES.map((tipo) => (
+                    <button key={tipo} type="button" onClick={() => setPresentationType(tipo)}
+                      className={`px-4 py-1.5 rounded-full text-sm border transition-all ${presentationType === tipo ? "btn-gold border-transparent" : "border-[#C9A84C]/50 text-[#2C1810]/70 hover:border-[#C9A84C]"}`}>
+                      {tipo}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>

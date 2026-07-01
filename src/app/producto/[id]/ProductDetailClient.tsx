@@ -43,7 +43,7 @@ export default function ProductDetailClient({
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
-  const PRESENTATION_TYPES = ["Caja", "Bolsa de Celofán", "Tull"];
+  const PRESENTATION_TYPES = ["Caja", "Bolsa de Celofán", "Tul"];
 
   const isEvento = product.category === "eventos";
   const [ribbonColor, setRibbonColor] = useState(ribbonColors[0]?.label ?? "");

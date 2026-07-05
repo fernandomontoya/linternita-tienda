@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { Printer, ArrowLeft } from "lucide-react";
-import Link from "next/link";
 
 interface OrderItem {
   id?: string | null;
@@ -84,20 +83,20 @@ export default function ReciboClient({ order, payments }: { order: Order; paymen
   return (
     <div>
       {/* Controles — ocultos al imprimir */}
-      <div className="no-print flex items-center gap-4 mb-6">
-        <Link href={`/admin/pedidos/${order.id}`} className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-700 transition-colors">
-          <ArrowLeft size={15} /> Volver al pedido
-        </Link>
+      <div className="no-print flex items-center gap-4 mb-6 max-w-2xl mx-auto px-4 pt-6">
+        <button onClick={() => window.close()} className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-700 transition-colors">
+          <ArrowLeft size={15} /> Cerrar
+        </button>
         <button
           onClick={() => window.print()}
           className="ml-auto flex items-center gap-2 btn-gold px-5 py-2.5 rounded-xl font-semibold text-sm"
         >
-          <Printer size={16} /> Imprimir recibo
+          <Printer size={16} /> Imprimir / Guardar PDF
         </button>
       </div>
 
       {/* Recibo */}
-      <div className="print-container max-w-2xl mx-auto bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-6 text-[#2C1810]">
+      <div className="print-container max-w-2xl mx-auto mb-8 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-6 text-[#2C1810]">
 
         {/* Encabezado */}
         <div className="flex items-start justify-between">

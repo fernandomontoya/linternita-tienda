@@ -66,7 +66,7 @@ export default async function AdminPedidoDetallePage({ params }: { params: Promi
           </p>
           <DeliveryDateEditor orderId={order.id} deliveryDate={order.delivery_date ?? null} />
         </div>
-        <Link href={`/admin/pedidos/${order.id}/recibo`}
+        <Link href={`/recibo/${order.id}`} target="_blank"
           className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#C9A84C] border border-gray-200 hover:border-[#C9A84C] px-3 py-2 rounded-xl transition-colors">
           <Printer size={13} /> Recibo
         </Link>

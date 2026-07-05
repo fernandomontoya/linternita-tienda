@@ -67,13 +67,19 @@ export default function ReciboClient({ order, payments }: { order: Order; paymen
   const items = order.items as OrderItem[];
 
   useEffect(() => {
-    // Añadir estilos de impresión al head solo en cliente
     const style = document.createElement("style");
     style.innerHTML = `
+      /* Ocultar chrome del sitio en la página de recibo */
+      body > div > div.min-h-full > header,
+      body > div > div.min-h-full > footer,
+      body > div > div.min-h-full > main > div.min-h-screen > header,
+      header.sticky,
+      footer,
+      .fixed.bottom-6 { display: none !important; }
+      body { background: white !important; }
       @media print {
         .no-print { display: none !important; }
-        body { background: white !important; }
-        .print-container { box-shadow: none !important; border: none !important; }
+        .print-container { box-shadow: none !important; border: none !important; border-radius: 0 !important; }
       }
     `;
     document.head.appendChild(style);

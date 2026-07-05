@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { Printer, ArrowLeft } from "lucide-react";
+import Image from "next/image";
 
 interface OrderItem {
   id?: string | null;
@@ -124,13 +125,16 @@ export default function ReciboClient({ order, payments }: { order: Order; paymen
 
         {/* Encabezado */}
         <div className="flex items-start justify-between">
-          <div>
-            <p className="text-xl font-bold text-[#C9A84C]">Linternita</p>
-            <p className="text-sm text-gray-500">Velas Artesanales</p>
-            <p className="text-xs text-gray-400 mt-0.5">linternita.com.mx · contacto@linternita.com.mx</p>
+          <div className="flex items-center gap-3">
+            <Image src="/logo.png" alt="Linternita" width={52} height={52} className="rounded-full" />
+            <div>
+              <p className="text-xl font-bold text-[#C9A84C]">Linternita</p>
+              <p className="text-sm text-gray-500">Velas Artesanales</p>
+              <p className="text-xs text-gray-400 mt-0.5">linternita.com.mx · contacto@linternita.com.mx</p>
+            </div>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-gray-800">Recibo</p>
+            <p className="text-2xl font-bold text-gray-800">Su pedido</p>
             <span className={`inline-block mt-1 text-xs font-semibold px-2.5 py-0.5 rounded-full ${STATUS_STYLES[order.status] ?? "bg-gray-100 text-gray-600"}`}>
               {STATUS_LABELS[order.status] ?? order.status}
             </span>

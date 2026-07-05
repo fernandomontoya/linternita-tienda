@@ -175,57 +175,63 @@ export default function ReciboClient({ order, payments }: { order: Order; paymen
           </table>
         </div>
 
-        {/* Total */}
-        <div className="border-t border-gray-200 pt-3 flex justify-between items-center">
-          <span className="text-sm font-semibold text-gray-700">Total del pedido</span>
-          <span className="text-xl font-bold text-[#C9A84C]">{fmt(Number(order.total))}</span>
-        </div>
+        {/* Resumen financiero — siempre visible */}
+        <div className="border-t border-gray-200 pt-4 space-y-3">
 
-        {/* Historial de pagos */}
-        {payments.length > 0 && (
-          <div>
-            <div className="border-t border-dashed border-gray-200 mb-4" />
-            <p className="text-xs text-gray-400 uppercase tracking-wide mb-3">Historial de pagos</p>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-100 text-xs text-gray-400">
-                  <th className="text-left pb-2 font-medium">Fecha</th>
-                  <th className="text-left pb-2 font-medium">Concepto</th>
-                  <th className="text-left pb-2 font-medium">Método</th>
-                  <th className="text-right pb-2 font-medium">Monto</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {payments.map((p) => (
-                  <tr key={p.id}>
-                    <td className="py-2 text-gray-600 text-xs">
-                      {new Date(p.paid_at + "T12:00:00").toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })}
-                    </td>
-                    <td className="py-2 text-gray-700">
-                      <p>{TYPE_LABELS[p.payment_type] ?? p.payment_type}</p>
-                      {p.notes && <p className="text-xs text-gray-400">{p.notes}</p>}
-                    </td>
-                    <td className="py-2 text-gray-500 text-xs">{METHOD_LABELS[p.payment_method] ?? p.payment_method}</td>
-                    <td className="py-2 text-right font-semibold text-gray-800">{fmt(Number(p.amount))}</td>
+          {/* Historial de pagos (solo si hay) */}
+          {payments.length > 0 && (
+            <>
+              <p className="text-xs text-gray-400 uppercase tracking-wide">Pagos recibidos</p>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 text-xs text-gray-400">
+                    <th className="text-left pb-2 font-medium">Fecha</th>
+                    <th className="text-left pb-2 font-medium">Concepto</th>
+                    <th className="text-left pb-2 font-medium">Método</th>
+                    <th className="text-right pb-2 font-medium">Monto</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {payments.map((p) => (
+                    <tr key={p.id}>
+                      <td className="py-2 text-gray-600 text-xs">
+                        {new Date(p.paid_at + "T12:00:00").toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })}
+                      </td>
+                      <td className="py-2 text-gray-700">
+                        <p>{TYPE_LABELS[p.payment_type] ?? p.payment_type}</p>
+                        {p.notes && <p className="text-xs text-gray-400">{p.notes}</p>}
+                      </td>
+                      <td className="py-2 text-gray-500 text-xs">{METHOD_LABELS[p.payment_method] ?? p.payment_method}</td>
+                      <td className="py-2 text-right font-semibold text-gray-800">{fmt(Number(p.amount))}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          )}
 
-            <div className="mt-4 space-y-1.5 text-sm border-t border-gray-100 pt-3">
-              <div className="flex justify-between">
-                <span className="text-gray-500">Total pagado</span>
-                <span className="font-semibold text-green-600">{fmt(totalPaid)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Saldo pendiente</span>
-                <span className={`font-bold text-base ${balance > 0 ? "text-red-500" : "text-green-600"}`}>
-                  {fmt(Math.max(0, balance))}
-                </span>
-              </div>
+          {/* Totales */}
+          <div className="border-t border-gray-100 pt-3 space-y-2 text-sm">
+            <div className="flex justify-between items-center">
+              <span className="font-semibold text-gray-700">Total del pedido</span>
+              <span className="text-xl font-bold text-[#C9A84C]">{fmt(Number(order.total))}</span>
             </div>
+            {payments.length > 0 && (
+              <>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500">Total pagado</span>
+                  <span className="font-semibold text-green-600">{fmt(totalPaid)}</span>
+                </div>
+                <div className="flex justify-between items-center border-t border-dashed border-gray-200 pt-2">
+                  <span className="font-bold text-gray-700">Saldo pendiente</span>
+                  <span className={`text-lg font-bold ${balance > 0 ? "text-red-500" : "text-green-600"}`}>
+                    {fmt(Math.max(0, balance))}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Notas */}
         {order.notes && (

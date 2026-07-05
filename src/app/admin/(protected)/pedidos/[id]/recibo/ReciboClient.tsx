@@ -45,6 +45,24 @@ interface Payment {
   paid_at: string;
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  pendiente:  "Pendiente",
+  pagado:     "Pagado",
+  en_proceso: "En proceso",
+  enviado:    "Enviado",
+  entregado:  "Entregado",
+  cancelado:  "Cancelado",
+};
+
+const STATUS_STYLES: Record<string, string> = {
+  pendiente:  "bg-yellow-50 text-yellow-600",
+  pagado:     "bg-blue-50 text-blue-600",
+  en_proceso: "bg-purple-50 text-purple-600",
+  enviado:    "bg-indigo-50 text-indigo-600",
+  entregado:  "bg-green-50 text-green-600",
+  cancelado:  "bg-red-50 text-red-500",
+};
+
 const TYPE_LABELS: Record<string, string> = {
   anticipo: "Anticipo",
   abono: "Abono",
@@ -112,8 +130,11 @@ export default function ReciboClient({ order, payments }: { order: Order; paymen
             <p className="text-xs text-gray-400 mt-0.5">linternita.com.mx · contacto@linternita.com.mx</p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-gray-800">Recibo #{order.order_number}</p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-2xl font-bold text-gray-800">Recibo</p>
+            <span className={`inline-block mt-1 text-xs font-semibold px-2.5 py-0.5 rounded-full ${STATUS_STYLES[order.status] ?? "bg-gray-100 text-gray-600"}`}>
+              {STATUS_LABELS[order.status] ?? order.status}
+            </span>
+            <p className="text-xs text-gray-400 mt-1.5">
               Pedido: {new Date(order.created_at).toLocaleDateString("es-MX", { day: "2-digit", month: "long", year: "numeric" })}
             </p>
             {order.delivery_date && (
@@ -216,26 +237,22 @@ export default function ReciboClient({ order, payments }: { order: Order; paymen
             </>
           )}
 
-          {/* Totales */}
+          {/* Totales — siempre visibles */}
           <div className="border-t border-gray-100 pt-3 space-y-2 text-sm">
             <div className="flex justify-between items-center">
               <span className="font-semibold text-gray-700">Total del pedido</span>
               <span className="text-xl font-bold text-[#C9A84C]">{fmt(Number(order.total))}</span>
             </div>
-            {payments.length > 0 && (
-              <>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-500">Total pagado</span>
-                  <span className="font-semibold text-green-600">{fmt(totalPaid)}</span>
-                </div>
-                <div className="flex justify-between items-center border-t border-dashed border-gray-200 pt-2">
-                  <span className="font-bold text-gray-700">Saldo pendiente</span>
-                  <span className={`text-lg font-bold ${balance > 0 ? "text-red-500" : "text-green-600"}`}>
-                    {fmt(Math.max(0, balance))}
-                  </span>
-                </div>
-              </>
-            )}
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500">Total pagado</span>
+              <span className="font-semibold text-green-600">{fmt(totalPaid)}</span>
+            </div>
+            <div className="flex justify-between items-center border-t border-dashed border-gray-200 pt-2">
+              <span className="font-bold text-gray-700">Saldo pendiente</span>
+              <span className={`text-lg font-bold ${balance > 0 ? "text-red-500" : "text-green-600"}`}>
+                {fmt(Math.max(0, balance))}
+              </span>
+            </div>
           </div>
         </div>
 

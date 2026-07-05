@@ -25,6 +25,7 @@ interface Order {
   id: string;
   order_number: number;
   created_at: string;
+  delivery_date?: string | null;
   customer_name: string;
   customer_email?: string;
   customer_phone?: string;
@@ -108,8 +109,13 @@ export default function ReciboClient({ order, payments }: { order: Order; paymen
           <div className="text-right">
             <p className="text-2xl font-bold text-gray-800">Recibo #{order.order_number}</p>
             <p className="text-xs text-gray-400 mt-1">
-              {new Date(order.created_at).toLocaleDateString("es-MX", { day: "2-digit", month: "long", year: "numeric" })}
+              Pedido: {new Date(order.created_at).toLocaleDateString("es-MX", { day: "2-digit", month: "long", year: "numeric" })}
             </p>
+            {order.delivery_date && (
+              <p className="text-xs text-[#C9A84C] font-medium mt-0.5">
+                Entrega: {new Date(order.delivery_date + "T12:00:00").toLocaleDateString("es-MX", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })}
+              </p>
+            )}
           </div>
         </div>
 

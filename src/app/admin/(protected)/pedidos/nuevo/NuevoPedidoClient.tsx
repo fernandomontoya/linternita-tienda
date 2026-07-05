@@ -43,6 +43,7 @@ export default function NuevoPedidoClient({ products }: { products: CatalogProdu
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
   const [notes, setNotes] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("");
 
   // Items
   const [items, setItems] = useState<LineItem[]>([]);
@@ -148,6 +149,7 @@ export default function NuevoPedidoClient({ products }: { products: CatalogProdu
         customer_phone: customerPhone.trim() || null,
         customer_address: customerAddress.trim() || null,
         notes: notes.trim() || null,
+        delivery_date: deliveryDate || null,
         items: orderItems,
         total,
         payment_method: "whatsapp",
@@ -191,6 +193,10 @@ export default function NuevoPedidoClient({ products }: { products: CatalogProdu
           <div>
             <label className="text-xs text-gray-500 mb-1 block">Dirección / Entrega</label>
             <input value={customerAddress} onChange={(e) => setCustomerAddress(e.target.value)} className={inputCls} placeholder="Calle, colonia, ciudad" />
+          </div>
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Fecha de entrega</label>
+            <input type="date" value={deliveryDate} onChange={(e) => setDeliveryDate(e.target.value)} className={inputCls} />
           </div>
         </div>
         <div>

@@ -4,6 +4,7 @@ import { ArrowLeft, Printer } from "lucide-react";
 import { notFound } from "next/navigation";
 import OrderStatusBadge from "@/components/admin/OrderStatusBadge";
 import PagosSection, { Payment } from "@/components/admin/PagosSection";
+import DeliveryDateEditor from "@/components/admin/DeliveryDateEditor";
 
 export default async function AdminPedidoDetallePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -61,8 +62,9 @@ export default async function AdminPedidoDetallePage({ params }: { params: Promi
             )}
           </div>
           <p className="text-xs text-gray-400 mt-0.5">
-            {new Date(order.created_at).toLocaleDateString("es-MX", { weekday: "long", day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+            Pedido: {new Date(order.created_at).toLocaleDateString("es-MX", { weekday: "long", day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
           </p>
+          <DeliveryDateEditor orderId={order.id} deliveryDate={order.delivery_date ?? null} />
         </div>
         <Link href={`/admin/pedidos/${order.id}/recibo`}
           className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#C9A84C] border border-gray-200 hover:border-[#C9A84C] px-3 py-2 rounded-xl transition-colors">

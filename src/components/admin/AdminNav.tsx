@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { LogOut, Package, LayoutDashboard, ExternalLink, ShoppingBag, Tag, Sparkles, Palette, Gift } from "lucide-react";
+import { LogOut, Package, LayoutDashboard, ExternalLink, ShoppingBag, Tag, Sparkles, Palette, Gift, PlusCircle } from "lucide-react";
 
 export default function AdminNav({ userEmail }: { userEmail: string }) {
   const router = useRouter();

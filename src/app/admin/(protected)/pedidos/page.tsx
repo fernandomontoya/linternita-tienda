@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, PlusCircle } from "lucide-react";
 import OrderStatusBadge from "@/components/admin/OrderStatusBadge";
 
 export default async function AdminPedidosPage() {
@@ -26,6 +26,10 @@ export default async function AdminPedidosPage() {
           <h1 className="text-xl font-bold text-gray-900">Pedidos</h1>
           <p className="text-sm text-gray-400 mt-0.5">{orders?.length ?? 0} pedidos en total</p>
         </div>
+        <Link href="/admin/pedidos/nuevo"
+          className="flex items-center gap-1.5 btn-gold px-4 py-2 rounded-xl text-sm font-semibold">
+          <PlusCircle size={15} /> Nuevo pedido
+        </Link>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">

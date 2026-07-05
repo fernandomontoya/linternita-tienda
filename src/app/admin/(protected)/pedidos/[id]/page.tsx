@@ -1,21 +1,43 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Printer } from "lucide-react";
 import { notFound } from "next/navigation";
 import OrderStatusBadge from "@/components/admin/OrderStatusBadge";
+import PagosSection, { Payment } from "@/components/admin/PagosSection";
 
 export default async function AdminPedidoDetallePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
-  const { data: order } = await supabase.from("orders").select("*").eq("id", id).single();
+
+  const [{ data: order }, { data: rawPayments }] = await Promise.all([
+    supabase.from("orders").select("*").eq("id", id).single(),
+    supabase.from("payments").select("*").eq("order_id", id).order("paid_at"),
+  ]);
+
   if (!order) notFound();
+
+  const payments: Payment[] = (rawPayments ?? []).map((p) => ({
+    id: p.id,
+    amount: Number(p.amount),
+    payment_type: p.payment_type,
+    payment_method: p.payment_method,
+    notes: p.notes ?? null,
+    paid_at: p.paid_at,
+  }));
 
   const fmt = (p: number) =>
     new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0 }).format(p);
 
   const items = order.items as {
     name: string; quantity: number; unitPrice: number; subtotal: number; aroma?: string; size?: string;
-    eventDetails?: { ribbonColor?: string; cardColor?: string; eventName?: string; eventDate?: string; phrase?: string };
+    eventDetails?: {
+      ribbonColor?: string;
+      cardColor?: string;
+      presentationType?: string;
+      eventName?: string;
+      eventDate?: string;
+      phrase?: string;
+    };
   }[];
 
   const methodLabel: Record<string, string> = {
@@ -30,15 +52,22 @@ export default async function AdminPedidoDetallePage({ params }: { params: Promi
         <Link href="/admin/pedidos" className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-700 transition-colors">
           <ArrowLeft size={15} /> Pedidos
         </Link>
-        <div>
-          <div className="flex items-center gap-3">
+        <div className="flex-1">
+          <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-xl font-bold text-gray-900">Pedido #{order.order_number}</h1>
             <OrderStatusBadge status={order.status} orderId={order.id} />
+            {order.source === "manual" && (
+              <span className="text-[10px] bg-purple-100 text-purple-600 font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide">Manual</span>
+            )}
           </div>
           <p className="text-xs text-gray-400 mt-0.5">
             {new Date(order.created_at).toLocaleDateString("es-MX", { weekday: "long", day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
           </p>
         </div>
+        <Link href={`/admin/pedidos/${order.id}/recibo`}
+          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#C9A84C] border border-gray-200 hover:border-[#C9A84C] px-3 py-2 rounded-xl transition-colors">
+          <Printer size={13} /> Recibo
+        </Link>
       </div>
 
       {/* Productos */}
@@ -56,11 +85,12 @@ export default async function AdminPedidoDetallePage({ params }: { params: Promi
                 </p>
                 {item.eventDetails && (
                   <div className="text-xs text-[#C9A84C] mt-1 space-y-0.5">
+                    {item.eventDetails.presentationType && <p>🎁 Presentación: {item.eventDetails.presentationType}</p>}
                     {item.eventDetails.ribbonColor && <p>🎀 Listón: {item.eventDetails.ribbonColor}</p>}
                     {item.eventDetails.cardColor && <p>🎴 Tarjeta: {item.eventDetails.cardColor}</p>}
                     {item.eventDetails.eventName && <p>🎉 Evento: {item.eventDetails.eventName}</p>}
                     {item.eventDetails.eventDate && <p>📅 Fecha: {item.eventDetails.eventDate}</p>}
-                    {item.eventDetails.phrase && <p>💬 Frase: "{item.eventDetails.phrase}"</p>}
+                    {item.eventDetails.phrase && <p>💬 Frase: &quot;{item.eventDetails.phrase}&quot;</p>}
                   </div>
                 )}
               </div>
@@ -73,6 +103,9 @@ export default async function AdminPedidoDetallePage({ params }: { params: Promi
           <span className="text-lg font-bold text-[#C9A84C]">{fmt(Number(order.total))}</span>
         </div>
       </div>
+
+      {/* Pagos */}
+      <PagosSection orderId={order.id} orderTotal={Number(order.total)} initialPayments={payments} />
 
       {/* Cliente */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
@@ -105,10 +138,16 @@ export default async function AdminPedidoDetallePage({ params }: { params: Promi
               <p className="font-medium text-gray-800">{order.customer_address}</p>
             </div>
           )}
+          {order.notes && (
+            <div className="col-span-2">
+              <p className="text-xs text-gray-400 mb-0.5">Notas internas</p>
+              <p className="text-gray-600 text-sm">{order.notes}</p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Acciones rápidas */}
+      {/* WhatsApp */}
       {order.customer_phone && (
         <a
           href={`https://wa.me/52${order.customer_phone.replace(/\D/g, "")}?text=Hola%20${encodeURIComponent(order.customer_name.split(" ")[0])}!%20Te%20contactamos%20de%20Linternita%20sobre%20tu%20pedido%20%23${order.order_number}`}

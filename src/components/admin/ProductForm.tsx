@@ -24,6 +24,7 @@ interface ProductFormData {
   active: boolean;
   width_cm: number | null;
   height_cm: number | null;
+  molds: number | null;
 }
 
 export default function ProductForm({
@@ -63,6 +64,7 @@ export default function ProductForm({
     active: initialData?.active ?? true,
     width_cm: (initialData as Partial<ProductFormData & { width_cm?: number | null }>)?.width_cm ?? null,
     height_cm: (initialData as Partial<ProductFormData & { height_cm?: number | null }>)?.height_cm ?? null,
+    molds: (initialData as Partial<ProductFormData & { molds?: number | null }>)?.molds ?? null,
   });
 
   const [newSize, setNewSize] = useState<Size & { id: string }>({ id: "", name: "", priceModifier: 0, isPackage: false });
@@ -179,6 +181,15 @@ export default function ProductForm({
                 <label className="text-xs font-medium text-gray-600 block mb-1">Stock *</label>
                 <input required type="number" min={0} value={form.stock}
                   onChange={(e) => setForm((f) => ({ ...f, stock: Number(e.target.value) }))}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C]" />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-600 block mb-1">
+                  Moldes <span className="text-gray-400 font-normal">— opcional</span>
+                </label>
+                <input type="number" min={0} value={form.molds ?? ""}
+                  onChange={(e) => setForm((f) => ({ ...f, molds: e.target.value === "" ? null : Number(e.target.value) }))}
+                  placeholder="Ej. 3"
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C9A84C]" />
               </div>
             </div>

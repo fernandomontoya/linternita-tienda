@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { Plus, Loader2, Trash2 } from "lucide-react";
+import { Plus, Loader2, Trash2, FileText } from "lucide-react";
 
 export interface Payment {
   id: string;
@@ -127,6 +127,15 @@ export default function PagosSection({
                 <p className="text-[11px] text-gray-300 mt-0.5">{new Date(p.paid_at + "T12:00:00").toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })}</p>
               </div>
               <span className="text-sm font-bold text-gray-800">{fmt(Number(p.amount))}</span>
+              <a
+                href={`/recibo/pago/${p.id}`}
+                target="_blank"
+                rel="noreferrer"
+                title="Ver comprobante"
+                className="text-gray-300 hover:text-[#C9A84C] transition-colors"
+              >
+                <FileText size={13} />
+              </a>
               <button onClick={() => handleDelete(p.id)} disabled={deleting === p.id} className="text-gray-200 hover:text-red-400 transition-colors">
                 {deleting === p.id ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
               </button>

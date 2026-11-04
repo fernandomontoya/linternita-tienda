@@ -16,7 +16,19 @@ export default async function ComprobantePagoPage({ params }: { params: { id: st
 
   if (!payment) redirect("/admin/pedidos");
 
-  const order = payment.orders as Record<string, unknown>;
+  const order = payment.orders as {
+    id: string;
+    order_number: number;
+    customer_name: string;
+    customer_phone?: string;
+    customer_email?: string;
+    total: number;
+    status: string;
+    created_at: string;
+    delivery_date?: string | null;
+    items: unknown;
+    notes?: string;
+  };
   const { orders: _orders, ...paymentData } = payment;
 
   // Calcular el acumulado hasta este pago (pagos anteriores + este)

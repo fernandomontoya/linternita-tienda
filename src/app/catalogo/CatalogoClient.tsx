@@ -71,15 +71,20 @@ function CatalogoContent({ products, categories }: Props) {
           <p>No encontramos productos con esos filtros.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          {filtered.map((product) => (
-            <ProductCardDb
-                key={product.id}
-                product={product}
-                categoryLabel={categories.find((c) => c.id === product.category)?.label}
-              />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            {filtered.map((product) => (
+              <ProductCardDb
+                  key={product.id}
+                  product={product}
+                  categoryLabel={categories.find((c) => c.id === product.category)?.label}
+                />
+            ))}
+          </div>
+          <p className="text-center text-xs text-gray-400 mt-8">
+            * Los precios mostrados son orientativos y están sujetos a cambio sin previo aviso.
+          </p>
+        </>
       )}
     </div>
   );

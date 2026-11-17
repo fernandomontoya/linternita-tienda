@@ -14,7 +14,7 @@ interface Props {
 function CatalogoContent({ products, categories }: Props) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [activeCategory, setActiveCategory] = useState(searchParams.get("categoria") || "todos");
+  const [activeCategory, setActiveCategory] = useState(searchParams.get("categoria") || "navidad");
   const [search, setSearch] = useState("");
 
   const selectCategory = useCallback((id: string) => {

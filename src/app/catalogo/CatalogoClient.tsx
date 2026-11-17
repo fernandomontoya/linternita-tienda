@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useMemo, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { DbProduct } from "@/lib/products";
 import ProductCardDb from "@/components/ProductCardDb";
 import { Suspense } from "react";
@@ -13,8 +13,20 @@ interface Props {
 
 function CatalogoContent({ products, categories }: Props) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [activeCategory, setActiveCategory] = useState(searchParams.get("categoria") || "todos");
   const [search, setSearch] = useState("");
+
+  const selectCategory = useCallback((id: string) => {
+    setActiveCategory(id);
+    const params = new URLSearchParams(searchParams.toString());
+    if (id === "todos") {
+      params.delete("categoria");
+    } else {
+      params.set("categoria", id);
+    }
+    router.replace(`/catalogo${params.toString() ? "?" + params.toString() : ""}`, { scroll: false });
+  }, [router, searchParams]);
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
@@ -45,7 +57,7 @@ function CatalogoContent({ products, categories }: Props) {
 
       <div className="flex flex-wrap justify-center gap-2 mb-10">
         <button
-          onClick={() => setActiveCategory("todos")}
+          onClick={() => selectCategory("todos")}
           className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
             activeCategory === "todos" ? "btn-gold" : "border border-[#C9A84C] text-[#C9A84C] hover:bg-[#C9A84C] hover:text-white"
           }`}
@@ -55,7 +67,7 @@ function CatalogoContent({ products, categories }: Props) {
         {categories.map((cat) => (
           <button
             key={cat.id}
-            onClick={() => setActiveCategory(cat.id)}
+            onClick={() => selectCategory(cat.id)}
             className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
               activeCategory === cat.id ? "btn-gold" : "border border-[#C9A84C] text-[#C9A84C] hover:bg-[#C9A84C] hover:text-white"
             }`}

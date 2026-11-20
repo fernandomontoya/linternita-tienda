@@ -63,7 +63,7 @@ export default function ComprobanteClient({
       header.sticky, footer, .fixed.bottom-6 { display: none !important; }
       body { background: white !important; }
       @media print {
-        @page { size: 105mm 135mm; margin: 4mm; }
+        @page { size: 105mm auto; margin: 0; }
         .no-print { display: none !important; }
         .print-card {
           box-shadow: none !important;

@@ -97,7 +97,7 @@ export default function ReciboClient({ order, payments }: { order: Order; paymen
       .fixed.bottom-6 { display: none !important; }
       body { background: white !important; }
       @media print {
-        @page { size: 105mm 135mm; margin: 0; }
+        @page { size: 105mm auto; margin: 0; }
         .no-print { display: none !important; }
         body { margin: 0 !important; padding: 0 !important; }
         .print-container {

@@ -97,18 +97,19 @@ export default function ReciboClient({ order, payments }: { order: Order; paymen
       .fixed.bottom-6 { display: none !important; }
       body { background: white !important; }
       @media print {
-        @page { size: 80mm auto; margin: 4mm; }
-        html, body { width: 80mm !important; font-size: 10px !important; }
+        @page { size: 80mm auto; margin: 3mm; }
         .no-print { display: none !important; }
         .print-container {
           box-shadow: none !important;
           border: none !important;
           border-radius: 0 !important;
-          max-width: 80mm !important;
-          width: 80mm !important;
-          margin: 0 !important;
-          padding: 4mm !important;
+          max-width: 74mm !important;
+          width: 74mm !important;
+          margin: 0 auto !important;
+          padding: 3mm !important;
+          font-size: 9pt !important;
         }
+        .print-container * { font-size: inherit; }
       }
     `;
     document.head.appendChild(style);

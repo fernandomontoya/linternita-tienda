@@ -63,19 +63,17 @@ export default function ComprobanteClient({
       header.sticky, footer, .fixed.bottom-6 { display: none !important; }
       body { background: white !important; }
       @media print {
-        @page {
-          size: 80mm 120mm;
-          margin: 0;
-        }
-        html, body { width: 80mm; }
+        @page { size: 80mm auto; margin: 4mm; }
+        html, body { width: 80mm !important; font-size: 10px !important; }
         .no-print { display: none !important; }
         .print-card {
           box-shadow: none !important;
           border: none !important;
           border-radius: 0 !important;
           max-width: 80mm !important;
+          width: 80mm !important;
           margin: 0 !important;
-          padding: 6mm 5mm !important;
+          padding: 4mm !important;
         }
       }
     `;

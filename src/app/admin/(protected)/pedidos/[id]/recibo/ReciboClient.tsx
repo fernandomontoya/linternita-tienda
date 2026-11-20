@@ -97,8 +97,18 @@ export default function ReciboClient({ order, payments }: { order: Order; paymen
       .fixed.bottom-6 { display: none !important; }
       body { background: white !important; }
       @media print {
+        @page { size: 80mm auto; margin: 4mm; }
+        html, body { width: 80mm !important; font-size: 10px !important; }
         .no-print { display: none !important; }
-        .print-container { box-shadow: none !important; border: none !important; border-radius: 0 !important; }
+        .print-container {
+          box-shadow: none !important;
+          border: none !important;
+          border-radius: 0 !important;
+          max-width: 80mm !important;
+          width: 80mm !important;
+          margin: 0 !important;
+          padding: 4mm !important;
+        }
       }
     `;
     document.head.appendChild(style);

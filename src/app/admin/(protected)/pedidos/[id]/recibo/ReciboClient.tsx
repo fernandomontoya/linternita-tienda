@@ -97,19 +97,40 @@ export default function ReciboClient({ order, payments }: { order: Order; paymen
       .fixed.bottom-6 { display: none !important; }
       body { background: white !important; }
       @media print {
-        @page { size: 105mm 135mm; margin: 4mm; }
+        @page { size: 105mm 135mm; margin: 0; }
         .no-print { display: none !important; }
+        body { margin: 0 !important; padding: 0 !important; }
         .print-container {
           box-shadow: none !important;
           border: none !important;
           border-radius: 0 !important;
-          max-width: 97mm !important;
-          width: 97mm !important;
-          margin: 0 auto !important;
-          padding: 3mm !important;
-          font-size: 8pt !important;
+          max-width: 105mm !important;
+          width: 105mm !important;
+          margin: 0 !important;
+          padding: 4mm 5mm !important;
+          font-size: 7.5pt !important;
+          break-inside: avoid;
+          page-break-inside: avoid;
+          page-break-after: avoid;
         }
-        .print-container * { font-size: inherit; }
+        .print-container * {
+          font-size: inherit;
+          line-height: 1.3 !important;
+        }
+        .print-container .space-y-6 > * + * { margin-top: 3mm !important; }
+        .print-container .space-y-3 > * + * { margin-top: 1.5mm !important; }
+        .print-container .space-y-2 > * + * { margin-top: 1mm !important; }
+        .print-container .mb-8 { margin-bottom: 2mm !important; }
+        .print-container .py-2\\.5 { padding-top: 1mm !important; padding-bottom: 1mm !important; }
+        .print-container .py-2 { padding-top: 0.8mm !important; padding-bottom: 0.8mm !important; }
+        .print-container .pt-4 { padding-top: 2mm !important; }
+        .print-container .pt-3 { padding-top: 1.5mm !important; }
+        .print-container .mb-3 { margin-bottom: 1.5mm !important; }
+        .print-container .gap-4 { gap: 2mm !important; }
+        .print-container img { width: 28px !important; height: 28px !important; }
+        .print-container .text-2xl { font-size: 10pt !important; }
+        .print-container .text-xl { font-size: 9pt !important; }
+        .print-container .text-lg { font-size: 8pt !important; }
       }
     `;
     document.head.appendChild(style);

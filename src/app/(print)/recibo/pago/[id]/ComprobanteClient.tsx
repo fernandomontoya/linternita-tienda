@@ -63,8 +63,20 @@ export default function ComprobanteClient({
       header.sticky, footer, .fixed.bottom-6 { display: none !important; }
       body { background: white !important; }
       @media print {
+        @page {
+          size: 80mm 120mm;
+          margin: 0;
+        }
+        html, body { width: 80mm; }
         .no-print { display: none !important; }
-        .print-card { box-shadow: none !important; border: none !important; border-radius: 0 !important; }
+        .print-card {
+          box-shadow: none !important;
+          border: none !important;
+          border-radius: 0 !important;
+          max-width: 80mm !important;
+          margin: 0 !important;
+          padding: 6mm 5mm !important;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -95,7 +107,7 @@ export default function ComprobanteClient({
       </div>
 
       {/* Comprobante */}
-      <div className="print-card max-w-lg mx-auto mb-8 bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-5 text-[#2C1810]">
+      <div className="print-card max-w-sm mx-auto mb-8 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-3 text-[#2C1810]">
 
         {/* Encabezado */}
         <div className="flex items-start justify-between">
